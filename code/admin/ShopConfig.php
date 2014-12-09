@@ -16,11 +16,12 @@ class ShopConfig extends DataObject {
 		'LicenceKey' => 'Varchar',
 
 		'BaseCurrency' => 'Varchar(3)',
-		'BaseCurrencyPrecision' => 'Int',	//number of digits after the decimal place
+		'BaseCurrencyPrecision' => 'Int',	// number of digits after the decimal place
 		'BaseCurrencySymbol' => 'Varchar(10)',
 
 		'CartTimeout' => 'Int',
 		'CartTimeoutUnit' => "Enum('minute, hour, day', 'hour')",
+		
 		'StockCheck' => 'Boolean',
 		'StockManagement' => "Enum('strict, relaxed', 'strict')",
 
@@ -34,7 +35,8 @@ class ShopConfig extends DataObject {
 	);
 
 	private static $has_many = array(
-		'Attributes' => 'Attribute_Default'
+		//'Attributes' => 'Attribute_Default'
+		'Attributes' => 'Attribute'
 	);
 
 	private static $defaults = array(
@@ -46,10 +48,11 @@ class ShopConfig extends DataObject {
 	);
 
 	public static function current_shop_config() {
-
-		//TODO: lazy load this
-
-		return ShopConfig::get()->First();
+		$shopconfig = ShopConfig::get()->First();
+		
+		//$this->extend('edit_current_shop_config', $shopconfig);
+		
+		return $shopconfig;
 	}
 
 	public static function base_currency_warning() {
@@ -57,9 +60,9 @@ class ShopConfig extends DataObject {
 		$warning = null;
 
 		if (!$config->BaseCurrency) {
-		 $warning = _t('ShopConfig.BASE_CURRENCY_WARNING','
+			$warning = _t('ShopConfig.BASE_CURRENCY_WARNING','
 				 Warning: Base currency is not set, please set base currency in the shop settings area before proceeding
-		 ');
+			');
 		}
 		return $warning;
 	}

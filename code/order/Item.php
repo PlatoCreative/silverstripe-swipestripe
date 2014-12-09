@@ -17,13 +17,13 @@ class Item extends DataObject {
 		'ProductVersion' => 'Int',
 		'VariationVersion' => 'Int'
 	);
+	
+	private static $default_sort = 'LastEdited DESC';
 
 	public function Amount() {
-
 		// TODO: Multi currency
-
 		$order = $this->Order();
-
+		
 		$amount = Price::create();
 		$amount->setAmount($this->Price);
 		$amount->setCurrency($order->BaseCurrency);
@@ -40,7 +40,6 @@ class Item extends DataObject {
 	 * @return Price
 	 */
 	public function Price() {
-		
 		$amount = $this->Amount();
 
 		//Transform price here for display in different currencies etc.
@@ -94,9 +93,7 @@ class Item extends DataObject {
 	}
 
 	public function UnitAmount() {
-
 		$itemAmount = $this->Amount();
-
 		$amount = $itemAmount->getAmount();
 
 		foreach ($this->ItemOptions() as $itemOption) {
@@ -114,7 +111,6 @@ class Item extends DataObject {
 	 * @return Money Item price inclusive of item options prices
 	 */
 	public function UnitPrice() {
-
 		$itemPrice = $this->Price();
 		$amount = $itemPrice->getAmount();
 
@@ -123,7 +119,6 @@ class Item extends DataObject {
 		} 
 
 		// TODO: Multi currency
-
 		$unitPrice = clone $itemPrice;
 		$unitPrice->setAmount($amount);
 		return $unitPrice;
@@ -135,14 +130,12 @@ class Item extends DataObject {
 	 * @return Price Item total inclusive of item options prices and quantity
 	 */
 	public function Total() {
-
 		$unitAmount = $this->UnitAmount();
 		$unitAmount->setAmount($unitAmount->getAmount() * $this->Quantity);
 		return $unitAmount;
 	}
 
 	public function TotalPrice() {
-
 		$unitPrice = $this->UnitPrice();
 		$unitPrice->setAmount($unitPrice->getAmount() * $this->Quantity);
 		return $unitPrice;
@@ -163,8 +156,9 @@ class Item extends DataObject {
 	 * 
 	 * @return Mixed Product if it exists, otherwise null
 	 */
-	function Product() {
-		return Versioned::get_version('Product', $this->ProductID, $this->ProductVersion);
+	function Product(){
+		$product = Product::get()->byID($this->ProductID);//Versioned::get_version('Product', $this->ProductID, $this->ProductVersion);
+		return $product;
 	}
 	
 	/**
@@ -184,9 +178,7 @@ class Item extends DataObject {
 	 * @return ValidationResult
 	 */
 	function validate() {
-
-		$result = new ValidationResult(); 
-		
+		$result = new ValidationResult();
 		$product = $this->Product();
 		$variation = $this->Variation();
 		$quantity = $this->Quantity;

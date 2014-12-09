@@ -33,7 +33,7 @@ class Option extends DataObject implements PermissionProvider {
 	 */
 	private static $has_one = array(
 		'Attribute' => 'Attribute',
-		'Product' => 'Product'
+		//'Product' => 'Product'
 	);
 	
 	/**
@@ -71,17 +71,23 @@ class Option extends DataObject implements PermissionProvider {
 
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
+		
 		$fields->removeByName('Variations');
-		$fields->removeByName('ProductID');
+		//$fields->removeByName('ProductID');
 		$fields->removeByName('AttributeID');
 		$fields->removeByName('SortOrder');
+		
 		return $fields;
 	}
-
+	
+	public function onBeforeWrite() {
+		parent::onBeforeWrite();
+		//$this->ProductID = 0;
+	}
 }
 
+/*
 class Option_Default extends Option {
-
 	private static $singular_name = 'Option';
 	private static $plural_name = 'Options';
 
@@ -90,3 +96,4 @@ class Option_Default extends Option {
 		$this->ProductID = 0;
 	}
 }
+*/

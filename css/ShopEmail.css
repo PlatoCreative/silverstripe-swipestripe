@@ -5,26 +5,37 @@
 */
 /* #Less Elements
 ================================================== */
+/* line 8, ../scss/ShopEmail.scss */
 .clearfix {
   *zoom: 1;
 }
+
+/* line 11, ../scss/ShopEmail.scss */
 .clearfix:before,
 .clearfix:after {
   display: table;
   content: "";
 }
+
+/* line 16, ../scss/ShopEmail.scss */
 .clearfix:after {
   clear: both;
 }
+
+/* line 19, ../scss/ShopEmail.scss */
 .sws table {
   max-width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+/* line 24, ../scss/ShopEmail.scss */
 .sws .table {
   width: 100%;
   margin-bottom: 18px;
 }
+
+/* line 28, ../scss/ShopEmail.scss */
 .sws .table th,
 .sws .table td {
   padding: 8px;
@@ -33,23 +44,35 @@
   vertical-align: top;
   border-top: 1px solid #ddd;
 }
+
+/* line 36, ../scss/ShopEmail.scss */
 .sws .table th {
   font-weight: bold;
 }
+
+/* line 39, ../scss/ShopEmail.scss */
 .sws .table thead th {
   vertical-align: bottom;
 }
+
+/* line 42, ../scss/ShopEmail.scss */
 .sws .table thead:first-child tr th,
 .sws .table thead:first-child tr td {
   border-top: 0;
 }
+
+/* line 46, ../scss/ShopEmail.scss */
 .sws .table tbody + tbody {
   border-top: 2px solid #ddd;
 }
+
+/* line 49, ../scss/ShopEmail.scss */
 .sws .table-condensed th,
 .sws .table-condensed td {
   padding: 4px 5px;
 }
+
+/* line 53, ../scss/ShopEmail.scss */
 .sws .table-bordered {
   border: 1px solid #ddd;
   border-collapse: separate;
@@ -58,130 +81,184 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
+
+/* line 61, ../scss/ShopEmail.scss */
 .sws .table-bordered th + th,
 .sws .table-bordered td + td,
 .sws .table-bordered th + td,
 .sws .table-bordered td + th {
   border-left: 1px solid #ddd;
 }
+
+/* line 67, ../scss/ShopEmail.scss */
 .sws .table-bordered thead:first-child tr:first-child th,
 .sws .table-bordered tbody:first-child tr:first-child th,
 .sws .table-bordered tbody:first-child tr:first-child td {
   border-top: 0;
 }
+
+/* line 72, ../scss/ShopEmail.scss */
 .sws .table-bordered thead:first-child tr:first-child th:first-child,
 .sws .table-bordered tbody:first-child tr:first-child td:first-child {
   -webkit-border-radius: 4px 0 0 0;
   -moz-border-radius: 4px 0 0 0;
   border-radius: 4px 0 0 0;
 }
+
+/* line 78, ../scss/ShopEmail.scss */
 .sws .table-bordered thead:first-child tr:first-child th:last-child,
 .sws .table-bordered tbody:first-child tr:first-child td:last-child {
   -webkit-border-radius: 0 4px 0 0;
   -moz-border-radius: 0 4px 0 0;
   border-radius: 0 4px 0 0;
 }
+
+/* line 84, ../scss/ShopEmail.scss */
 .sws .table-bordered thead:last-child tr:last-child th:first-child,
 .sws .table-bordered tbody:last-child tr:last-child td:first-child {
   -webkit-border-radius: 0 0 0 4px;
   -moz-border-radius: 0 0 0 4px;
   border-radius: 0 0 0 4px;
 }
+
+/* line 90, ../scss/ShopEmail.scss */
 .sws .table-bordered thead:last-child tr:last-child th:last-child,
 .sws .table-bordered tbody:last-child tr:last-child td:last-child {
   -webkit-border-radius: 0 0 4px 0;
   -moz-border-radius: 0 0 4px 0;
   border-radius: 0 0 4px 0;
 }
+
+/* line 96, ../scss/ShopEmail.scss */
 .sws .table-striped tbody tr:nth-child(odd) td,
 .sws .table-striped tbody tr:nth-child(odd) th {
   background-color: #f9f9f9;
 }
+
+/* line 100, ../scss/ShopEmail.scss */
 .sws .table tbody tr:hover td,
 .sws .table tbody tr:hover th {
   background-color: #f5f5f5;
 }
+
+/* line 104, ../scss/ShopEmail.scss */
 .sws table .span1 {
   float: none;
   width: 44px;
   margin-left: 0;
 }
+
+/* line 109, ../scss/ShopEmail.scss */
 .sws table .span2 {
   float: none;
   width: 124px;
   margin-left: 0;
 }
+
+/* line 114, ../scss/ShopEmail.scss */
 .sws table .span3 {
   float: none;
   width: 204px;
   margin-left: 0;
 }
+
+/* line 119, ../scss/ShopEmail.scss */
 .sws table .span4 {
   float: none;
   width: 284px;
   margin-left: 0;
 }
+
+/* line 124, ../scss/ShopEmail.scss */
 .sws table .span5 {
   float: none;
   width: 364px;
   margin-left: 0;
 }
+
+/* line 129, ../scss/ShopEmail.scss */
 .sws table .span6 {
   float: none;
   width: 444px;
   margin-left: 0;
 }
+
+/* line 134, ../scss/ShopEmail.scss */
 .sws table .span7 {
   float: none;
   width: 524px;
   margin-left: 0;
 }
+
+/* line 139, ../scss/ShopEmail.scss */
 .sws table .span8 {
   float: none;
   width: 604px;
   margin-left: 0;
 }
+
+/* line 144, ../scss/ShopEmail.scss */
 .sws table .span9 {
   float: none;
   width: 684px;
   margin-left: 0;
 }
+
+/* line 149, ../scss/ShopEmail.scss */
 .sws table .span10 {
   float: none;
   width: 764px;
   margin-left: 0;
 }
+
+/* line 154, ../scss/ShopEmail.scss */
 .sws table .span11 {
   float: none;
   width: 844px;
   margin-left: 0;
 }
+
+/* line 159, ../scss/ShopEmail.scss */
 .sws table .span12 {
   float: none;
   width: 924px;
   margin-left: 0;
 }
+
 /* #Email Styles
 ================================================== */
+/* line 166, ../scss/ShopEmail.scss */
 .order {
   margin: 15px 0;
 }
+
+/* line 169, ../scss/ShopEmail.scss */
 .order .table th {
   background: #eeeeee;
 }
+
+/* line 172, ../scss/ShopEmail.scss */
 .order .table td {
   background: #ffffff;
 }
+
+/* line 175, ../scss/ShopEmail.scss */
 .order .table td .alert {
   margin-bottom: 0px;
 }
+
+/* line 178, ../scss/ShopEmail.scss */
 .order .table td.row-header {
   text-align: right;
   font-weight: bold;
 }
+
+/* line 182, ../scss/ShopEmail.scss */
 .order .table td.mod-title {
   font-weight: normal;
 }
+
+/* line 185, ../scss/ShopEmail.scss */
 .order .table .totals-column {
   text-align: right;
 }

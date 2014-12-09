@@ -16,7 +16,7 @@ class Attribute extends DataObject implements PermissionProvider {
 
 	private static $singular_name = 'Attribute';
 	private static $plural_name = 'Attributes';
-
+	
 	public $firstWrite = false;
 
 	/**
@@ -41,8 +41,9 @@ class Attribute extends DataObject implements PermissionProvider {
 	);
 
 	private static $has_one = array(
-		'Product' => 'Product',
-		'DefaultAttribute' => 'Attribute_Default'
+		//'Product' => 'Product',
+		//'DefaultAttribute' => 'Attribute_Default'
+		'ShopConfig' => 'ShopConfig'
 	);
 	
 	/**
@@ -96,19 +97,17 @@ class Attribute extends DataObject implements PermissionProvider {
 	 * @return FieldList
 	 */
 	function getCMSFields() {
-
 		$fields = new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('Attribute',
-					TextField::create('Title')
-						->setRightTitle('For displaying on the product page'),
-					TextField::create('Description')
-						->setRightTitle('For displaying on the order'),
+					TextField::create('Title')->setRightTitle('For displaying on the product page'),
+					TextField::create('Description')->setRightTitle('For displaying on the order'),
 					HiddenField::create('ProductID')
 				)
 			)
 		);
-
+		
+		/*
 		if (!$this->ID) {
 			$defaultAttributes = Attribute_Default::get();
 			if ($defaultAttributes && $defaultAttributes->exists()) {
@@ -125,7 +124,8 @@ class Attribute extends DataObject implements PermissionProvider {
 				$fields->addFieldToTab('Root.Attribute', new HeaderField('AttributeOr', 'Or create new one...', 5), 'Title');
 			}
 		}
-
+		*/
+		
 		if ($this->ID) {
 			$fields->addFieldToTab('Root.Options', GridField::create(
 				'Options',
@@ -136,6 +136,7 @@ class Attribute extends DataObject implements PermissionProvider {
 		}
 
 		$this->extend('updateCMSFields', $fields);
+		
 		return $fields;
 	}
 
@@ -149,7 +150,6 @@ class Attribute extends DataObject implements PermissionProvider {
 	}
 
 	public function TitleOptionSummary() {
-
 		$optionString = '';
 		$options  = $this->Options();
 		if ($options && $options->exists()) {
@@ -160,16 +160,19 @@ class Attribute extends DataObject implements PermissionProvider {
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
+		
+		$shopConfig = ShopConfig::current_shop_config();
+		$this->ShopConfigID = $shopConfig->ID;
+		
 		$this->firstWrite = !$this->isInDB();
-
 		if ($this->firstWrite) {
-
+			/*
 			$defaultAttribute = $this->DefaultAttribute();
 			if ($defaultAttribute && $defaultAttribute->exists()) {
-
 				$this->Title = $defaultAttribute->Title;
 				$this->Description = $defaultAttribute->Description;
 			}
+			*/
 		}
 	}
 
@@ -178,7 +181,7 @@ class Attribute extends DataObject implements PermissionProvider {
 
 		//Check if first write
 		if ($this->firstWrite) {
-
+			/*
 			$defaultAttribute = $this->DefaultAttribute();
 			if ($defaultAttribute && $defaultAttribute->exists()) {
 
@@ -191,9 +194,11 @@ class Attribute extends DataObject implements PermissionProvider {
 					$newOption->write();
 				}
 			}
+			*/
 		}
 
-		//If product variation does not have a complete set of valid options, then disable it
+		// If product variation does not have a complete set of valid options, then disable it
+		/*
 		$product = $this->Product();
 		$variations = $product->Variations();
 
@@ -203,23 +208,24 @@ class Attribute extends DataObject implements PermissionProvider {
 				$variation->write();
 			}
 		}
+		*/
 	}
 
-	public function getOptionField($prev = null) {
-		return Attribute_OptionField::create($this, $prev);
+	public function getOptionField($prev = null, $product) {
+		return Attribute_OptionField::create($this, $prev, $product);
 	}
 
 }
 
 class Attribute_OptionField extends DropdownField {
 
-	public function __construct($attr, $prev = null) {
-
+	public function __construct($attr, $prev = null, $product) {
+		$shopConfig = ShopConfig::current_shop_config();
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
 		Requirements::javascript('swipestripe/javascript/Attribute_OptionField.js');
 
-		$product = $attr->Product();
+		//$product = $attr->Product();
 
 		//Pass in the attribute ID
 		$name = "Options[" . $attr->ID . "]";
@@ -230,8 +236,7 @@ class Attribute_OptionField extends DropdownField {
 		$this->addExtraClass('dropdown');
 
 		//If previous attribute field exists, listen to it and react with new options
-		if ($prev && $prev->exists()) {
-
+		if ($prev && $prev->exists()){
 			$this->setAttribute('data-prev', "Options[" . $prev->ID  . "]");
 
 			$variations = $product->Variations();
@@ -265,6 +270,7 @@ class Attribute_OptionField extends DropdownField {
 	}
 }
 
+/*
 class Attribute_Default extends Attribute {
 
 	private static $singular_name = 'Attribute';
@@ -307,5 +313,4 @@ class Attribute_Default extends Attribute {
 		return $fields;
 	}
 }
-
-
+*/

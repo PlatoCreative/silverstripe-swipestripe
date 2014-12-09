@@ -4,7 +4,10 @@ name: SwipeStripe
 
 Director:
   rules:
-    'product//$ID!/$Action': 'Product_Controller'
+    'product/$ID!/$Action' : 'Product_Controller',
+    '/$URLSegment/product/$ID!/$Action' : 'Product_Controller',
+    '/$URLSegment/$URLSegment/product/$ID!/$Action' : 'Product_Controller',
+    '/$URLSegment/$URLSegment/$URLSegment/product/$ID!/$Action' : 'Product_Controller'
 
 Modifier:
   Enabled:
@@ -19,12 +22,15 @@ Security:
 Payment:
   extensions: 
     - 'Payment_Extension'
+
 PaymentProcessor:
   extensions: 
     - 'Payment_ProcessorExtension'
+
 LeftAndMain:
   extensions: 
     - 'ShopAdmin_LeftAndMainExtension'
+
 Page_Controller:
   extensions: 
     - 'Cart'

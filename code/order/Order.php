@@ -523,16 +523,13 @@ class Order extends DataObject implements PermissionProvider {
 	 * @param ArrayList $productOptions The product variations to be added, usually just one
 	 */
 	public function addItem(Product $product, Variation $variation, $quantity = 1, ArrayList $options = null) {
-
-		//Increment the quantity if this item exists already
+		// Increment the quantity if this item exists already
 		$item = $this->findIdenticalItem($product, $variation, $options);
 
 		if ($item && $item->exists()) {
 			$item->Quantity = $item->Quantity + $quantity;
 			$item->write();
-		}
-		else {
-
+		} else {
 			DB::getConn()->transactionStart();
 			try {
 
@@ -569,7 +566,6 @@ class Order extends DataObject implements PermissionProvider {
 				throw $e;
 			}
 			DB::getConn()->transactionEnd();
-
 		}
 		
 		$this->updateTotal();
@@ -632,12 +628,12 @@ class Order extends DataObject implements PermissionProvider {
 		$modifications = $this->Modifications();
 		$shopConfig = ShopConfig::current_shop_config();
 		
-		if ($items) foreach ($items as $item) {
+		if($items) foreach ($items as $item) {
 			$total += $item->Total()->Amount;
 			$subTotal += $item->Total()->Amount;
 		}
 
-		if ($modifications) foreach ($modifications as $modification) {
+		if($modifications) foreach ($modifications as $modification) {
 			
 			if ($modification->SubTotalModifier) {
 				$total += $modification->Amount()->getAmount();

@@ -1,5 +1,5 @@
 <div class="account-page sws">
-	<h2>$Title</h2>
+	<h1>$Title</h1>
 
 	$Content
 	

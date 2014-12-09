@@ -1,6 +1,6 @@
 <tr>
 	<td>
-		<a href="#" data-item="$Item.ID" class="remove-item-js"></a>
+		<a href="#" data-item="$Item.ID" class="cart-summary-remove small-cross"></a>
 	</td>
 
 	<td> 

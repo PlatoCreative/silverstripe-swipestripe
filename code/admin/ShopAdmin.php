@@ -10,15 +10,12 @@
 class ShopAdmin extends ModelAdmin {
 
 	private static $url_segment = 'shop';
-
 	private static $url_priority = 50;
-
-	private static $menu_title = 'Shop';
+	private static $menu_title = 'Shop Settings';
 
 	public $showImportForm = false;
 
 	private static $managed_models = array(
-		//'Product',
 		'Order',
 		'Customer',
 		'ShopConfig'
@@ -37,13 +34,7 @@ class ShopAdmin extends ModelAdmin {
 		'SettingsForm'
 	);
 
-	public function init() {
-
-		// set reading lang
-		// if(Object::has_extension('SiteTree', 'Translatable') && !$this->request->isAjax()) {
-		// 	Translatable::choose_site_locale(array_keys(Translatable::get_existing_content_languages('SiteTree')));
-		// }
-		
+	public function init() {		
 		parent::init();
 
 		Requirements::css(CMS_DIR . '/css/screen.css');
@@ -107,7 +98,6 @@ class ShopAdmin extends ModelAdmin {
 	 * @return SS_List of forms 
 	 */
 	protected function getManagedModelTabs() {
-
 		$forms  = new ArrayList();
 
 		$models = $this->getManagedModels();
@@ -180,7 +170,6 @@ class ShopAdmin extends ModelAdmin {
 		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
 		$form->setFormAction(Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'EditForm'));
 		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
-
 		$this->extend('updateEditForm', $form);
 		
 		return $form;
@@ -195,7 +184,6 @@ class ShopAdmin extends ModelAdmin {
 	}
 
 	public function Snippets() {
-
 		$snippets = new ArrayList();
 		$subClasses = ClassInfo::subclassesFor('ShopAdmin');
 
@@ -401,7 +389,6 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 			'LinkTitle' => 'Edit Email Settings'
 		))->renderWith('ShopAdmin_Snippet');
 	}
-
 }
 
 /**
@@ -535,7 +522,6 @@ class ShopAdmin_BaseCurrency extends ShopAdmin {
 	}
 
 	public function saveBaseCurrencySettings($data, $form) {
-
 		//Hack for LeftAndMain::getRecord()
 		self::$tree_class = 'ShopConfig';
 
@@ -578,175 +564,6 @@ class ShopAdmin_BaseCurrency extends ShopAdmin {
 			'LinkTitle' => 'Edit base currency'
 		))->renderWith('ShopAdmin_Snippet');
 	}
-
-}
-
-/**
- * Shop admin area for managing product attributes.
- * 
- * @author Frank Mullenger <frankmullenger@gmail.com>
- * @copyright Copyright (c) 2011, Frank Mullenger
- * @package swipestripe
- * @subpackage admin
- */
-class ShopAdmin_Attribute extends ShopAdmin {
-	
-	private static $tree_class = 'ShopConfig';
-	
-	private static $allowed_actions = array(
-		'AttributeSettings',
-		'AttributeSettingsForm',
-		'saveAttributeSettings'
-	);
-
-	private static $url_rule = 'ShopConfig/Attribute';
-	private static $url_priority = 75;
-	private static $menu_title = 'Shop Product Attributes';
-
-	private static $url_handlers = array(
-		'ShopConfig/Attribute/AttributeSettingsForm' => 'AttributeSettingsForm',
-		'ShopConfig/Attribute' => 'AttributeSettings'
-	);
-
-	public function init() {
-		parent::init();
-		if (!in_array(get_class($this), self::$hidden_sections)) {
-			$this->modelClass = 'ShopConfig';
-		}
-	}
-
-	public function Breadcrumbs($unlinked = false) {
-
-		$request = $this->getRequest();
-		$items = parent::Breadcrumbs($unlinked);
-
-		if ($items->count() > 1) $items->remove($items->pop());
-
-		$items->push(new ArrayData(array(
-			'Title' => 'Attribute Settings',
-			'Link' => $this->Link(Controller::join_links($this->sanitiseClassName($this->modelClass), 'Attribute'))
-		)));
-
-		return $items;
-	}
-
-	public function SettingsForm($request = null) {
-		return $this->AttributeSettingsForm();
-	}
-
-	public function AttributeSettings($request) {
-
-		if ($request->isAjax()) {
-			$controller = $this;
-			$responseNegotiator = new PjaxResponseNegotiator(
-				array(
-					'CurrentForm' => function() use(&$controller) {
-						return $controller->AttributeSettingsForm()->forTemplate();
-					},
-					'Content' => function() use(&$controller) {
-						return $controller->renderWith('ShopAdminSettings_Content');
-					},
-					'Breadcrumbs' => function() use (&$controller) {
-						return $controller->renderWith('CMSBreadcrumbs');
-					},
-					'default' => function() use(&$controller) {
-						return $controller->renderWith($controller->getViewer('show'));
-					}
-				),
-				$this->response
-			); 
-			return $responseNegotiator->respond($this->getRequest());
-		}
-
-		return $this->renderWith('ShopAdminSettings');
-	}
-
-	public function AttributeSettingsForm() {
-
-		$shopConfig = ShopConfig::get()->First();
-
-		$fields = new FieldList(
-			$rootTab = new TabSet('Root',
-				$tabMain = new Tab('Attribute',
-					GridField::create(
-						'Attributes',
-						'Attributes',
-						$shopConfig->Attributes(),
-						GridFieldConfig_HasManyRelationEditor::create()
-					)
-				)
-			)
-		);
-
-		$actions = new FieldList();
-		$actions->push(FormAction::create('saveAttributeSettings', _t('GridFieldDetailForm.Save', 'Save'))
-			->setUseButtonTag(true)
-			->addExtraClass('ss-ui-action-constructive')
-			->setAttribute('data-icon', 'add'));
-
-		$form = new Form(
-			$this,
-			'EditForm',
-			$fields,
-			$actions
-		);
-
-		$form->setTemplate('ShopAdminSettings_EditForm');
-		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
-		$form->addExtraClass('cms-content cms-edit-form center ss-tabset');
-		if($form->Fields()->hasTabset()) $form->Fields()->findOrMakeTab('Root')->setTemplate('CMSTabSet');
-		$form->setFormAction(Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'Attribute/AttributeSettingsForm'));
-
-		$form->loadDataFrom($shopConfig);
-
-		return $form;
-	}
-
-	public function saveAttributeSettings($data, $form) {
-
-		//Hack for LeftAndMain::getRecord()
-		self::$tree_class = 'ShopConfig';
-
-		$config = ShopConfig::get()->First();
-		$form->saveInto($config);
-		$config->write();
-		$form->sessionMessage('Saved Attribute Settings', 'good');
-
-		$controller = $this;
-		$responseNegotiator = new PjaxResponseNegotiator(
-			array(
-				'CurrentForm' => function() use(&$controller) {
-					//return $controller->renderWith('ShopAdminSettings_Content');
-					return $controller->AttributeSettingsForm()->forTemplate();
-				},
-				'Content' => function() use(&$controller) {
-					//return $controller->renderWith($controller->getTemplatesWithSuffix('_Content'));
-				},
-				'Breadcrumbs' => function() use (&$controller) {
-					return $controller->renderWith('CMSBreadcrumbs');
-				},
-				'default' => function() use(&$controller) {
-					return $controller->renderWith($controller->getViewer('show'));
-				}
-			),
-			$this->response
-		); 
-		return $responseNegotiator->respond($this->getRequest());
-	}
-
-	public function getSnippet() {
-
-		if (!$member = Member::currentUser()) return false;
-		if (!Permission::check('CMS_ACCESS_' . get_class($this), 'any', $member)) return false;
-
-		return $this->customise(array(
-			'Title' => 'Attribute Management',
-			'Help' => 'Create default attributes',
-			'Link' => Controller::join_links($this->Link('ShopConfig'), 'Attribute'),
-			'LinkTitle' => 'Edit default attributes'
-		))->renderWith('ShopAdmin_Snippet');
-	}
-
 }
 
 /**

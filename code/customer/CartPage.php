@@ -106,7 +106,8 @@ class CartPage_Controller extends Page_Controller {
 
 	private static $allowed_actions = array (
 		'index',
-		'CartForm'
+		'CartForm',
+		'RemoveItem'
 	);
 	
 	/**
@@ -114,8 +115,7 @@ class CartPage_Controller extends Page_Controller {
 	 * 
 	 * @return Array Contents for page rendering
 	 */
-	function index() {
-		
+	function index() {		
 		//Update stock levels
 		//Order::delete_abandoned();
 
@@ -133,11 +133,31 @@ class CartPage_Controller extends Page_Controller {
 	 * @return CartForm A new cart form
 	 */
 	function CartForm() {
-
 		return CartForm::create(
 			$this, 
 			'CartForm'
 		)->disableSecurityToken();
 	}
-
+	
+	/*
+	*	Remove items from the cart
+	*/
+	function RemoveItem(){
+		if(Director::is_ajax()){
+			$params = $this->getURLParams();
+			if(isset($params['ID']) && $params['ID'] != ''){
+				$item = Item::get()->byID(Convert::raw2sql($params['ID']));
+				if($item){
+					$result = $item->Delete();
+					$currentOrder = Cart::get_current_order();
+					$currentOrder->updateTotal();
+					
+					return Convert::array2json(array(
+						'result' => $result
+					));
+				}
+			}
+			return;	
+		}
+	}
 }

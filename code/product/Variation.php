@@ -21,7 +21,8 @@ class Variation extends DataObject implements PermissionProvider {
 		'Price' => 'Decimal(19,8)',
 		'Currency' => 'Varchar(3)',
 		'Status' => "Enum('Enabled,Disabled','Enabled')",
-		'SortOrder' => 'Int'
+		'SortOrder' => 'Int',
+		'Stock' => 'Int'
 	);
 
 	public function Amount() {
@@ -122,13 +123,25 @@ class Variation extends DataObject implements PermissionProvider {
 	 * @see Product::getCMSFields()
 	 */
 	public function __get($property) {
-
 		if (strpos($property, 'AttributeValue_') === 0) {
 			return $this->SummaryOfOptionValueForAttribute(str_replace('AttributeValue_', '', $property));
-		}
-		else {
+		} else {
 			return parent::__get($property);
 		}
+	}
+	
+	public function getAttributes(){
+		if($this->Options()){
+			$attributes = new ArrayList();
+			foreach($this->Options() as $option){
+				$attribute = $option->Attribute();
+				if(!$attributes->find('ID', $attribute->ID)){
+					$attributes->add($attribute);
+				}
+			}
+			return $attributes;
+		}
+		return false;
 	}
 	
 	/**
@@ -140,7 +153,6 @@ class Variation extends DataObject implements PermissionProvider {
 	public function getOptionForAttribute($attributeID) {
 		$options = $this->Options();
 		if ($options && $options->exists()) foreach ($options as $option) {
-			
 			if ($option->AttributeID == $attributeID) {
 				return $option;
 			}
@@ -154,7 +166,8 @@ class Variation extends DataObject implements PermissionProvider {
 	 * @return FieldList
 	 */
 	public function getCMSFields() {
-
+		$shopConfig = ShopConfig::current_shop_config();
+		
 		$fields = new FieldList(
 			$rootTab = new TabSet('Root',
 				$tabMain = new Tab('Variation')
@@ -162,9 +175,8 @@ class Variation extends DataObject implements PermissionProvider {
 		);
 
 		$product = $this->Product();
-		$attributes = $product->Attributes();
+		$attributes = $shopConfig->Attributes();//$product->Attributes();
 		if ($attributes && $attributes->exists()) foreach ($attributes as $attribute) {
-
 			$options = $attribute->Options();
 			$currentOptionID = ($currentOption = $this->Options()->find('AttributeID', $attribute->ID)) ? $currentOption->ID : null;
 
@@ -173,15 +185,15 @@ class Variation extends DataObject implements PermissionProvider {
 			$fields->addFieldToTab('Root.Variation', $optionField);
 		}
 
-		$fields->addFieldToTab('Root.Variation', PriceField::create('Price', 'Price')
-			->setRightTitle('Amount that this variation will increase the base product price by')
-		);
-
-		$fields->addFieldToTab('Root.Variation', DropdownField::create(
-			'Status', 
-			'Status', 
-			$this->dbObject('Status')->enumValues()
-		)->setRightTitle('You can disable a variation to prevent it being sold'));
+		$fields->addFieldsToTab('Root.Variation', array(
+			PriceField::create('Price', 'Price')->setRightTitle('Amount that this variation will increase the base product price by'),
+			TextField::create('Stock', 'Stock Level'),
+			DropdownField::create(
+				'Status', 
+				'Status', 
+				$this->dbObject('Status')->enumValues()
+			)->setRightTitle('You can disable a variation to prevent it being sold')
+		));
 
 		$this->extend('updateCMSFields', $fields);
 
@@ -281,7 +293,8 @@ class Variation extends DataObject implements PermissionProvider {
 		//Each variation should have only attributes that match the product
 
 		$productAttributeOptions = array();
-		$attributes = $this->Product()->Attributes();
+		$shopConfig = ShopConfig::current_shop_config();
+		$attributes = $shopConfig->Attributes();//$this->Product()->Attributes();
 
 		if ($attributes && $attributes->exists()) foreach ($attributes as $attribute) {
 			$options = $attribute->Options();
@@ -320,8 +333,9 @@ class Variation extends DataObject implements PermissionProvider {
 	public function isDuplicate() {
 
 		//Hacky way to get new option IDs from $this->record because $this->Options() returns existing options
-		//not the new ones passed in POST data    
-		$attributeIDs = $this->Product()->Attributes()->map()->toArray();
+		//not the new ones passed in POST data   
+		$shopConfig = ShopConfig::current_shop_config(); 
+		$attributeIDs = $shopConfig->Attributes()->map()->toArray();//$this->Product()->Attributes()->map()->toArray();
 		$variationAttributeOptions = array();
 		if ($attributeIDs) foreach ($attributeIDs as $attributeID => $title) {
 			

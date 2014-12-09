@@ -139,7 +139,7 @@ class CartForm extends Form {
 	 */
 	private function saveCart(Array $data, Form $form) {
 		$currentOrder = Cart::get_current_order();
-		$quantities = (isset($data['Quantity'])) ?$data['Quantity'] :null;
+		$quantities = (isset($data['Quantity'])) ?$data['Quantity'] : null;
 
 		if ($quantities) foreach ($quantities as $itemID => $quantity) {
 

@@ -8,14 +8,45 @@
  * @package swipestripe
  * @subpackage customer
  */
-class Cart extends Extension {
-
+class Cart extends DataExtension {
+	private static $allowed_actions = array(
+		'RefreshCartOverview'
+	);
+	
+	/**
+	 * Updates timestamp LastActive on the order, called on every page request. 
+	 */
+	public function onBeforeInit() {
+		$orderID = Session::get('Cart.OrderID');
+		if ($orderID && $order = DataObject::get_by_id('Order', $orderID)) {
+			$order->LastActive = SS_Datetime::now()->getValue();
+			$order->write();
+		}
+	}
+	
+	// TODO - Shift these to be better included
+	public function onAfterInit() {		
+		// CSS & JS
+		Requirements::css('swipestripe/css/Shop.css');
+		Requirements::javascript(THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js');
+		Requirements::javascript('swipestripe/javascript/Shop.js');	
+	}
+	
+	// Refresh content in the Cart Overview include
+	public function RefreshCartOverview(){
+		$this->owner->customise(array(
+			'Cart' => $this->Cart(),
+			'ajax' => Director::is_ajax()
+		));
+		return $this->owner->renderWith('CartOverview');
+	}
+	
 	/**
 	 * Retrieve the current cart for display in the template.
 	 * 
 	 * @return Order The current order (cart)
 	 */
-	function Cart() {
+	public function Cart() {
 		$order = self::get_current_order();
 		$order->Items();
 		$order->Total;
@@ -30,7 +61,7 @@ class Cart extends Extension {
 	 * @param String $type The type of cart page a link is needed for
 	 * @return String The URL to the particular page
 	 */
-	function CartLink($type = 'Cart') {
+	public function CartLink($type = 'Cart') {
 		switch ($type) {
 			case 'Account':
 				if ($page = DataObject::get_one('AccountPage')) return $page->Link();
@@ -57,7 +88,6 @@ class Cart extends Extension {
 	 * @return Order The current order (cart)
 	 */
 	public static function get_current_order($persist = false) {
-
 		$orderID = Session::get('Cart.OrderID');
 		$order = null;
 		
@@ -77,17 +107,5 @@ class Cart extends Extension {
 			}
 		}
 		return $order;
-	}
-
-	/**
-	 * Updates timestamp LastActive on the order, called on every page request. 
-	 */
-	function onBeforeInit() {
-
-		$orderID = Session::get('Cart.OrderID');
-		if ($orderID && $order = DataObject::get_by_id('Order', $orderID)) {
-			$order->LastActive = SS_Datetime::now()->getValue();
-			$order->write();
-		}
 	}
 }

@@ -26,7 +26,6 @@ class OrderForm extends Form {
 	 * @param Order $currentOrder
 	 */
 	function __construct($controller, $name) {
-
 		parent::__construct($controller, $name, FieldList::create(), FieldList::create(), null);
 
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
@@ -160,7 +159,8 @@ class OrderForm extends Form {
 		);
 
 		if (isset($personalFields)) {
-			$fields->push($personalFields);
+			// Removed as checkout hidden if not logged in already
+			//$fields->push($personalFields);
 		}
 
 		$this->extend('updateFields', $fields);

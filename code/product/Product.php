@@ -7,7 +7,6 @@
  * details about the Product.
  */
 class Product extends Page {
-	
 	/**
 	 * Flag for denoting if this is the first time this Product is being written.
 	 * 
@@ -22,7 +21,9 @@ class Product extends Page {
 	 */
 	private static $db = array(
 		'Price' => 'Decimal(19,8)',
-		'Currency' => 'Varchar(3)'
+		'Currency' => 'Varchar(3)',
+		'ShortDescription' => 'HTMLText',
+		'Stock' => 'Int'
 	);
 
 	/**
@@ -31,7 +32,6 @@ class Product extends Page {
 	 * @return Price
 	 */
 	public function Amount() {
-
 		// TODO: Multi currency
 		$shopConfig = ShopConfig::current_shop_config();
 
@@ -52,7 +52,6 @@ class Product extends Page {
 	 * @return Price
 	 */
 	public function Price() {
-		
 		$amount = $this->Amount();
 
 		//Transform price here for display in different currencies etc.
@@ -67,9 +66,23 @@ class Product extends Page {
 	 * @var Array
 	 */
 	private static $has_many = array(
-		'Attributes' => 'Attribute',
-		'Options' => 'Option',
-		'Variations' => 'Variation'
+		//'Attributes' => 'Attribute',
+		//'Options' => 'Option',
+		'Variations' => 'Variation',
+		'Images' => 'ProductImage'
+	);
+	
+	private static $has_one = array(
+		'MainCategory' => 'ProductCategory'
+	);
+	
+	/**
+	 * Belongs many many relations for Product
+	 * 
+	 * @var Array
+	 */
+	private static $belongs_many_many = array(
+		'ProductCategories' => 'ProductCategory'
 	);
 	
 	/**
@@ -96,22 +109,70 @@ class Product extends Page {
 			'field' => 'TextField',
 			'filter' => 'PartialMatchFilter',
 			'title' => 'Name'
+		),
+		'ProductCategories.Title' => array(
+			'field' => 'TextField',
+			'filter' => 'PartialMatchFilter',
+			'title' => 'Category'
 		)
 	);
+	
+	private static $casting = array(
+		//'ProductCategory' => 'Varchar',
+	);
 
-	/**
-	 * Set firstWrite flag if this is the first time this Product is written.
-	 * 
+	/** 
 	 * @see SiteTree::onBeforeWrite()
-	 * @see Product::onAfterWrite()
 	 */
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		if (!$this->ID) $this->firstWrite = true;
+		// Force product to never be in the sitetree
+		$this->ParentID = -1;
 
 		//Save in base currency
 		$shopConfig = ShopConfig::current_shop_config();
 		$this->Currency = $shopConfig->BaseCurrency;
+		
+		// Check for main category ID and the categories list
+		$productCategories = $this->ProductCategories();
+		$maincat = ProductCategory::get()->filter('ID', $this->MainCategoryID)->first(); 
+		if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
+			$productCategories->add($maincat);
+		}
+	}
+	
+	/** 
+	 * @see SiteTree::onAfterWrite()
+	 */
+	public function onAfterWrite() {
+		parent::onAfterWrite();
+	}
+	
+	/** 
+	 * @see SiteTree::onBeforePublish()
+	 */
+	public function onBeforePublish(){
+		// Fixes the can't find stage issue
+		if($this->stagesDiffer('Stage', 'Live')){
+			$this->writeToStage('Stage');
+		}
+	}
+	
+	/**
+	 * Delete images and clear categories link
+	 * 
+	 * @see SiteTree::onBeforeDelete()
+	 */
+	public function onBeforeDelete(){
+		parent::onBeforeDelete();
+		
+		if($this->Images() && $images = $this->Images()){
+			foreach($images as $image){
+				if($image->exists()){
+					$image->delete();	
+				}
+			}
+		}
 	}
 	
 	/**
@@ -122,7 +183,7 @@ class Product extends Page {
 	public function onAfterDelete() {
 		parent::onAfterDelete();
 	
-		if ($this->isPublished()) {
+		if($this->isPublished()) {
 			$this->doUnpublish();
 		}
 	}
@@ -134,40 +195,44 @@ class Product extends Page {
 	 * @return FieldList
 	 */
 	public function getCMSFields() {
-		
 		$shopConfig = ShopConfig::current_shop_config();
 		$fields = parent::getCMSFields();
-
-		//Product fields
-		$fields->addFieldToTab('Root.Main', new PriceField('Price'), 'Content');
-
-		//Replace URL Segment field
-		if ($this->ParentID == -1) {
-			$urlsegment = new SiteTreeURLSegmentField("URLSegment", 'URLSegment');
-			$baseLink = Controller::join_links(Director::absoluteBaseURL(), 'product/');
-			$url = (strlen($baseLink) > 36) ? "..." .substr($baseLink, -32) : $baseLink;
+		
+		$categories = ProductCategory::getAllCategories();		
+		if($categories){
+			// Product fields
+			$fields->addFieldToTab('Root.Main', PriceField::create('Price'), 'Content');
+	
+			// Replace URL Segment field
+			/*
+			$urlsegment = SiteTreeURLSegmentField::create("URLSegment", 'URLSegment');
+			$baseLink = Controller::join_links(Director::absoluteURL(), 'product/');
+			$url = (strlen($baseLink) > 36) ? "..." . substr($baseLink, -32) : $baseLink;
 			$urlsegment->setURLPrefix($url);
 			$fields->replaceField('URLSegment', $urlsegment);
-		}
-
-		if ($this->isInDB()) {
-
-			//Product attributes
-			$listField = new GridField(
-				'Attributes',
-				'Attributes',
-				$this->Attributes(),
-				GridFieldConfig_BasicSortable::create()
+			*/
+			
+			// Categories Fields
+			arsort($categories);
+			$fields->addFieldsToTab(
+				'Root.Main',
+				array(
+					DropDownField::create('MainCategoryID', 'Select main category', $categories)->setEmptyString('Select a category'),
+					ListboxField::create('ProductCategories', 'Categories')->setMultiple(true)->setSource($categories)->setAttribute('data-placeholder', 'Add categories')
+				),
+				'Content'
 			);
-			$fields->addFieldToTab('Root.Attributes', $listField);
-
+			
+			// Short Description
+			$fields->addFieldToTab('Root.Main', TextareaField::create('ShortDescription', 'Short Description'), 'Content');
+			
+			// Product images
+			$prodimgconf = GridFieldConfig_RelationEditor::create(10)->addComponent(new GridFieldSortableRows('SortOrder'));		
+			$fields->addFieldToTab('Root.Images', new GridField('Images', 'Images', $this->Images(), $prodimgconf));
+				
 			//Product variations
-			$attributes = $this->Attributes();
-			if ($attributes && $attributes->exists()) {
-				
-				//Remove the stock level field if there are variations, each variation has a stock field
-				$fields->removeByName('Stock');
-				
+			$attributes = $shopConfig->Attributes();//$this->Attributes();
+			if ($attributes && $attributes->exists()) {				
 				$variationFieldList = array();
 				foreach ($attributes as $attribute) {
 					$variationFieldList['AttributeValue_'.$attribute->ID] = $attribute->Title;
@@ -186,6 +251,18 @@ class Product extends Page {
 				);
 				$fields->addFieldToTab('Root.Variations', $listField);
 			}
+			
+			// Stock level
+			if($shopConfig->StockCheck){
+				if(!$this->Variations()){
+					$fields->addFieldToTab('Root.Main', TextField::create('Stock', 'Stock level'), 'MainCategoryID');	
+				}
+			}
+   
+		} else {
+			$fields->addFieldToTab('Root.Main', new LiteralField('CategoryWarning', 
+				'<p class="message warning">Please create a category before creating products.</p>'
+			), 'Title');	
 		}
 
 		//Ability to edit fields added to CMS here
@@ -200,6 +277,16 @@ class Product extends Page {
 		return $fields;
 	}
 	
+	public function getCMSValidator() { 
+		return new RequiredFields(array(
+			'Title',
+			'URLSegment',
+			'MenuTitle',
+			'MainCategoryID',
+			'Price'
+		)); 
+	}
+	
 	/**
 	 * Get the URL for this Product, products that are not part of the SiteTree are 
 	 * displayed by the {@link Product_Controller}.
@@ -209,11 +296,20 @@ class Product extends Page {
 	 * @return String
 	 */
 	public function Link($action = null) {
-		
 		if ($this->ParentID > -1) {
 			return parent::Link($action);
 		}
-		return Controller::join_links(Director::baseURL() . 'product/', $this->RelativeLink($action));
+		
+		if(Controller::curr() == 'ProductCategory_Controller'){ // Return the current category
+			$category = Controller::curr();
+			return Controller::join_links($category->Link() . 'product/', $this->URLSegment);//$this->ID);
+			
+		} else if($this->MainCategory()){ // Return the main category
+			return Controller::join_links($this->MainCategory()->Link() . 'product/', $this->URLSegment);//$this->ID);
+			
+		} else { // Return base url
+			return Controller::join_links(Director::baseURL() . 'product/', $this->RelativeLink($action));
+		}
 	}
 	
 	/**
@@ -223,11 +319,15 @@ class Product extends Page {
 	 * @return Boolean
 	 */
 	public function requiresVariation() {
+		$variations = $this->Variations();		
+		return $variations && $variations->exists();
+		/*
 		$attributes = $this->Attributes();
 		
 		$this->extend('updaterequiresVariation', $attributes);
 		
 		return $attributes && $attributes->exists();
+		*/
 	}
 	
 	/**
@@ -237,15 +337,15 @@ class Product extends Page {
 	 * @return ArrayList
 	 */
 	public function getOptionsForAttribute($attributeID) {
-
 		$options = new ArrayList();
 		$variations = $this->Variations();
 
-		if ($variations && $variations->exists()) foreach ($variations as $variation) {
-
-			if ($variation->isEnabled()) {
+		if($variations && $variations->exists()) foreach ($variations as $variation){
+			if($variation->isEnabled()){
 				$option = $variation->getOptionForAttribute($attributeID);
-				if ($option) $options->push($option); 
+				if($option){
+					$options->push($option);
+				}
 			}
 		}
 		$options = $options->sort('SortOrder');
@@ -258,19 +358,17 @@ class Product extends Page {
 	 * @see DataObject::validate()
 	 * @return ValidationResult
 	 */
-	public function validate() {
-		
+	public function validate(){
 		$result = new ValidationResult(); 
 
 		//If this is being published, check that enabled variations exist if they are required
 		$request = Controller::curr()->getRequest();
 		$publishing = ($request && $request->getVar('action_publish')) ? true : false;
 		
-		if ($publishing && $this->requiresVariation()) {
-			
+		if($publishing && $this->requiresVariation()){
 			$variations = $this->Variations();
 			
-			if (!in_array('Enabled', $variations->map('ID', 'Status')->toArray())) {
+			if(!in_array('Enabled', $variations->map('ID', 'Status')->toArray())){
 				$result->error(
 					'Cannot publish product when no variations are enabled. Please enable some product variations and try again.',
 					'VariationsDisabledError'
@@ -279,7 +377,24 @@ class Product extends Page {
 		}
 		return $result;
 	}
-
+	
+	// Check stock level
+	// TODO Improve for live cart checking
+	public function CheckStock($varID = null){
+		$shopConfig = ShopConfig::current_shop_config();
+		if($shopConfig->StockCheck){
+			if($varID){
+				$variation = Variation::get()->filter(array('ID' => $varID, 'ProductID' => $this->ID))->first();
+				return $variation->Stock > 0 ? true : false;
+			} else {
+				if(!$this->Variations()){
+					return $this->Stock > 0 ? true : false;
+				}
+			}
+			return false;
+		}
+		return true;
+	}
 }
 
 /**
@@ -299,7 +414,13 @@ class Product_Controller extends Page_Controller {
 	 * @var Array
 	 */
 	private static $allowed_actions = array(
-		'ProductForm'
+		'index',
+		'productform',
+		'ProductAdd'
+	);
+	
+	private static $url_handlers = array(
+		//'$Action/$ID/$OtherID' => '$Action'
 	);
 	
 	/**
@@ -307,55 +428,137 @@ class Product_Controller extends Page_Controller {
 	 * 
 	 * @see Page_Controller::init()
 	 */
-	public function init() {
+	public function init(){
 		parent::init();
 		
-		Requirements::css('swipestripe/css/Shop.css');
+		// CSS & JS
+		Requirements::javascript('swipestripe/javascript/Attribute_OptionField.js');
+		$params = $this->getURLParams();
 		
-		//Get current product page for products that are not part of the site tree
-		//and do not have a ParentID set, they are accessed via this controller using
-		//Director rules
-		if ($this->dataRecord->ID == -1) {
-			
-			$params = $this->getURLParams();
-			
-			if ($urlSegment = Convert::raw2sql($params['ID'])) {
-
-				$product = Product::get()
-					->where("\"URLSegment\" = '$urlSegment'")
-					->limit(1)
-					->first();
+		if($params['ID'] != '') {	
+			$product = $this->getProductFromUrl();
+			if($product && $product->exists()){				
+				$this->dataRecord = $product; 
+				$this->failover = $this->dataRecord;
+				$request = $this->request;
 				
-				if ($product && $product->exists()) {
-					$this->dataRecord = $product; 
-					$this->failover = $this->dataRecord;
-					
-					$this->customise(array(
-						'Product' => $this->data()
-					));
+				// Handle Actions - TODO: work out why this doesn't work normally
+				if(isset($params['Action']) && $params['Action'] != ''){
+					$val = $this->handleAction($request, $params['Action']);
+					if(Director::is_ajax()){
+						die($val);
+					}
 				}
+			} else {
+				return $this->httpError(404);
 			}
+		} else {
+			return $this->httpError(404);
 		}
 		
 		$this->extend('onInit');
 	}
 	
-	/**  
-	 * Legacy function allowing access to product data via $Product variable in templates
-	 */
-	public function Product() {
-		return $this->data();
+	public function Product(){
+		return $this->getProductFromUrl();
+	}
+	
+	public function getProductFromUrl($urlVar = null){
+		if(!$urlVar){
+			$params = $this->getURLParams();
+			if($params['ID'] != '') {	
+				$urlVar = $params['ID'];	
+			} else {
+				return false;	
+			}
+		}
+		$product = Product::get()->filter(array('URLSegment' => Convert::raw2sql($urlVar)))->first();	
+		if(!$product){
+			$product = Product::get()->byID(Convert::raw2sql($urlVar));
+		}
+		return $product;
 	}
 
-	public function ProductForm($quantity = null, $redirectURL = null) {
-
-		return ProductForm::create(
+	public function productform($quantity = null, $redirectURL = null) {
+		$form = ProductForm::create(
 			$this,
 			'ProductForm',
 			$quantity,
 			$redirectURL
 		)->disableSecurityToken();
+		
+		Session::set('ProductForm', $form);
+		
+		return $form;
+	}
+	
+	/**
+	 * Add an item to the current cart ({@link Order}) for a given {@link Product}.
+	 * 
+	 * @param $request
+	 *
+	 */
+	public function ProductAdd(SS_HTTPRequest $request) {
+		$form = Session::get('ProductForm');
+		if($request && $form){
+			$cart = Cart::get_current_order(true);
+			$data = $request->postVars();
+			$form->setRequest($request);
+			$form->loadDataFrom($data);
+
+			$added = $cart->addItem(
+				$form->getProduct(), 
+				$form->getVariation(), 
+				$form->getQuantity(), 
+				$form->getOptions()
+			);
+			
+			Session::clear('ProductForm');
+			
+			if(Director::is_ajax()){
+				return Convert::array2json(array(
+					'result' => $added->exists(),
+					'message' => $added ? 'Successfully added to your cart.' : 'There was an error updating your cart. Please try again.'
+				));	
+			} else {
+				//Show feedback if redirecting back to the Product page
+				if (!$this->getRequest()->requestVar('Redirect')) {
+					$cartPage = DataObject::get_one('CartPage');
+					$message = _t('ProductForm.PRODUCT_ADDED', 'The product was added to your cart.');
+					if ($cartPage->exists()) {
+						$message = _t(
+							'ProductForm.PRODUCT_ADDED_LINK', 
+							'The product was added to {openanchor}your cart{closeanchor}.',
+							array(
+								'openanchor' => "<a href=\"{$cartPage->Link()}\">",
+								'closeanchor' => "</a>"
+							)
+						);
+					}
+					$form->sessionMessage(
+						DBField::create_field("HTMLText", $message),
+						'good',
+						false
+					);
+				}
+			
+				$form->goToNextPage();
+			}
+			
+		} else {
+			if(Director::is_ajax()){
+				return Convert::array2json(array(
+					'result' => false,
+					'message' => 'There was an error updating your cart. Please try again.'
+				));
+			} else {
+				$message = _t('ProductForm.PRODUCT_ERROR', 'There was an error updating your cart. Please try again');
+				$form->sessionMessage(
+					DBField::create_field("HTMLText", $message),
+					'bad',
+					false
+				);	
+			}
+		}
 	}
 }
-
-

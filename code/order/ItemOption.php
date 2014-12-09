@@ -29,15 +29,14 @@ class ItemOption extends DataObject {
 	);
 
 	public function Amount() {
-
 		// TODO: Multi currency
-
 		$order = $this->Order();
 
 		$amount = Price::create();
 		$amount->setAmount($this->Price);
 		$amount->setCurrency($order->BaseCurrency);
 		$amount->setSymbol($order->BaseCurrencySymbol);
+		
 		return $amount;
 	}
 
@@ -46,10 +45,8 @@ class ItemOption extends DataObject {
 	 * 
 	 * @return Price
 	 */
-	public function Price() {
-		
+	public function Price() {		
 		$amount = $this->Amount();
-
 		//Transform price here for display in different currencies etc.
 		$this->extend('updatePrice', $amount);
 
@@ -59,5 +56,4 @@ class ItemOption extends DataObject {
 	public function Order() {
 		return $this->Item()->Order();
 	}
-
 }

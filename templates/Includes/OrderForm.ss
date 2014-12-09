@@ -1,5 +1,5 @@
 <% if IncludeFormTag %>
-<form $FormAttributes>
+	<form $FormAttributes>
 <% end_if %>
 
 	<% if Message %>
@@ -9,16 +9,6 @@
 	<% end_if %>
 
 	<fieldset>
-
-		<% if PersonalDetailsFields %>
-		<section class="personal-details">
-			<% loop PersonalDetailsFields %>
-				$FieldHolder
-			<% end_loop %>
-		</section>
-		
-		<hr />
-		<% end_if %>
 		
 		<section class="order-details">
 			<h3><%t CheckoutFormOrder.YOUR_ORDER 'Your Order' %></h3>
@@ -31,7 +21,18 @@
 			
 			<% include OrderFormCart %>
 		</section>
-	 
+		
+		<hr />
+		
+		<% if PersonalDetailsFields %>
+			<section class="personal-details">
+				<% loop PersonalDetailsFields %>
+					$FieldHolder
+				<% end_loop %>
+			</section>
+		
+			<hr />
+		<% end_if %>	 
 
 		<section class="notes">
 			<% loop NotesFields %>
@@ -52,17 +53,17 @@
 
 	<% if Cart.Items %>
 		<% if Actions %>
-		<div class="Actions">
-			<div class="loading">
-				<img src="swipestripe/images/loading.gif" />
+			<div class="Actions">
+				<div class="loading">
+					<img src="swipestripe/images/loading.gif" />
+				</div>
+				<% loop Actions %>
+					$Field
+				<% end_loop %>
 			</div>
-			<% loop Actions %>
-				$Field
-			<% end_loop %>
-		</div>
 		<% end_if %>
 	<% end_if %>
 	
 <% if IncludeFormTag %>
-</form>
+	</form>
 <% end_if %>
