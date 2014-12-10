@@ -76,7 +76,6 @@ class Payment_Extension extends DataExtension {
 	 * @see DataObjectDecorator::onAfterWrite()
 	 */
 	function onAfterWrite() {
-
 		$order = $this->owner->Order();
 
 		if ($order && $order->exists()) {
@@ -84,12 +83,19 @@ class Payment_Extension extends DataExtension {
 			$order->write();
 		}
 	}
+	
+	function getMethodName(){
+		$methodConfig = PaymentFactory::get_factory_config($this->owner->Method);
+		return $methodConfig['title'];	
+	}
+	
+	function getOrderPaymentRow(){
+		return $this->owner->renderWith(array('OrderPaymentRow_' . $this->owner->Method, 'OrderPaymentRow'));	
+	}
 }
 
 class Payment_ProcessorExtension extends Extension {
-
 	public function onBeforeRedirect() {
-
 		$order = $this->owner->payment->Order();
 		if ($order && $order->exists()) {
 			$order->onAfterPayment();

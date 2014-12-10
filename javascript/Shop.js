@@ -1,4 +1,6 @@
-$(document).ready(function(){
+
+jQuery.noConflict();
+jQuery(document).ready(function($) {
 	
 	/* CART OVERVIEW */
 	if($('#cart-overview').length > 0){

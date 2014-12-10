@@ -104,7 +104,7 @@ class OrderForm extends Form {
 				'PaymentMethod',
 				'Select Payment Method',
 				$source
-			)->setCustomValidationMessage(_t('CheckoutPage.SELECT_PAYMENT_METHOD',"Please select a payment method.")),
+			)->setCustomValidationMessage(_t('CheckoutPage.SELECT_PAYMENT_METHOD', "Please select a payment method."))->setEmptyString('Select a payment method'),
 			LiteralField::create('paymentoptions', '<div id="payment-load-area"></div>')
 		)->setName('PaymentFields');
 		
@@ -258,7 +258,7 @@ class OrderForm extends Form {
 		$order->OrderedOn = SS_Datetime::now()->getValue();
 		$order->write();
 
-		//Saving an update on the order
+		// Saving an update on the order
 		if ($notes = $data['Notes']) {
 			$update = new Order_Update();
 			$update->Note = $notes;
@@ -268,7 +268,7 @@ class OrderForm extends Form {
 			$update->write();
 		}
 
-		//Add modifiers to order
+		// Add modifiers to order
 		$order->updateModifications($data)->write();
 
 		Session::clear('Cart.OrderID');
@@ -278,11 +278,14 @@ class OrderForm extends Form {
 		try {
 			$shopConfig = ShopConfig::current_shop_config();
 			$precision = $shopConfig->BaseCurrencyPrecision;
-
+			
 			$paymentData = array(
 				'Amount' => number_format($order->Total()->getAmount(), $precision, '.', ''),
 				'Currency' => $order->Total()->getCurrency(),
-				'Reference' => $order->ID
+				'Reference' => $order->ID,
+				// Add to allow for extra payment fields to be posted
+				// TODO - Seems like should be a better way to pass?
+				'ExtraData' => $data
 			);
 			$paymentProcessor->payment->OrderID = $order->ID;
 			$paymentProcessor->payment->PaidByID = $member->ID;

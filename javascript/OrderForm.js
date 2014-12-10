@@ -1,4 +1,5 @@
-;(function($) { 
+jQuery.noConflict();
+jQuery(document).ready(function($) {
 	$.entwine('sws', function($){
 
 		$('.order-form').entwine({
@@ -48,4 +49,4 @@
 		});
 
 	});
-})(jQuery);
+});

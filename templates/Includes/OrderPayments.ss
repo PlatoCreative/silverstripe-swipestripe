@@ -9,12 +9,7 @@
 	</thead>
 	<tbody>
 		<% loop Payments %>  
-			<tr>
-				<td>$Method</td>
-				<td>$LastEdited.Nice24</td>
-				<td>$Amount.Nice $Currency</td>
-				<td>$Status</td>
-			</tr>
+			$OrderPaymentRow()
 		<% end_loop %>
 	</tbody>
 </table>

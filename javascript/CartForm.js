@@ -1,4 +1,5 @@
-;(function($) {
+jQuery.noConflict();
+jQuery(document).ready(function($) {
 	$.entwine('sws', function($){
 
 		$('.cart-form .remove-item-js').entwine({
@@ -28,4 +29,4 @@
 		});
 
 	});
-})(jQuery);
+});
