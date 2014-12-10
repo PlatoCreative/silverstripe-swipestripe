@@ -57,6 +57,7 @@
 				<div class="loading">
 					<img src="swipestripe/images/loading.gif" />
 				</div>
+				
 				<% loop Actions %>
 					$Field
 				<% end_loop %>

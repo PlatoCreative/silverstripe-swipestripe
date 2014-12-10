@@ -50,7 +50,6 @@ class OrderForm extends Form {
 	 * the current form if appropriate.
 	 */
 	public function setupFormErrors() {
-
 		//Only run when fields exist
 		if ($this->fields->exists()) {
 			parent::setupFormErrors();
@@ -58,113 +57,75 @@ class OrderForm extends Form {
 	}
 
 	public function createFields() {
-
 		$order = $this->order;
 		$member = $this->customer;
 
-		//Personal details fields
-		if(!$member->ID || $member->Password == '') {
-
-			$link = $this->controller->Link();
-			
-			$note = _t('CheckoutPage.NOTE','NOTE:');
-			$passwd = _t('CheckoutPage.PLEASE_CHOOSE_PASSWORD','Please choose a password, so you can login and check your order history in the future.');
-			$mber = sprintf(
-				_t('CheckoutPage.ALREADY_MEMBER', 'If you are already a member please %s log in. %s'), 
-				"<a href=\"Security/login?BackURL=$link\">", 
-				'</a>'
-			);
-
-			$personalFields = CompositeField::create(
-				new HeaderField(_t('CheckoutPage.ACCOUNT',"Account"), 3),
-				new CompositeField(
-					EmailField::create('Email', _t('CheckoutPage.EMAIL', 'Email'))
-						->setCustomValidationMessage(_t('CheckoutPage.PLEASE_ENTER_EMAIL_ADDRESS', "Please enter your email address."))
-				),
-				new CompositeField(
-					new FieldGroup(
-						new ConfirmedPasswordField('Password', _t('CheckoutPage.PASSWORD', "Password"))
-					)
-				),
-				new CompositeField(
-					new LiteralField(
-						'AccountInfo', 
-						"
-						<p class=\"alert alert-info\">
-							<strong class=\"alert-heading\">$note</strong>
-							$passwd <br /><br />
-							$mber
-						</p>
-						"
-					)
-				)
-			)->setID('PersonalDetails')->setName('PersonaDetails');
-		}
-
-		//Order item fields
+		// Order item fields
 		$items = $order->Items();
 		$itemFields = CompositeField::create()->setName('ItemsFields');
-		if ($items) foreach ($items as $item) {
-			$itemFields->push(new OrderForm_ItemField($item));
-		}
-
-		//Order modifications fields
-		$subTotalModsFields = CompositeField::create()->setName('SubTotalModificationsFields');
-		$subTotalMods = $order->SubTotalModifications();
-
-		if ($subTotalMods && $subTotalMods->exists()) foreach ($subTotalMods as $modification) {
-			$modFields = $modification->getFormFields();
-			foreach ($modFields as $field) {
-				$subTotalModsFields->push($field);
+		if($items){
+			foreach ($items as $item) {
+				$itemFields->push(new OrderForm_ItemField($item));
 			}
 		}
 
+		// Order modifications fields
+		$subTotalModsFields = CompositeField::create()->setName('SubTotalModificationsFields');
+		$subTotalMods = $order->SubTotalModifications();
+		if ($subTotalMods && $subTotalMods->exists()){
+			foreach ($subTotalMods as $modification) {
+				$modFields = $modification->getFormFields();
+				foreach ($modFields as $field) {
+					$subTotalModsFields->push($field);
+				}
+			}
+		}
 		$totalModsFields = CompositeField::create()->setName('TotalModificationsFields');
 		$totalMods = $order->TotalModifications();
-
-		if ($totalMods && $totalMods->exists()) foreach ($totalMods as $modification) {
-			$modFields = $modification->getFormFields();
-			foreach ($modFields as $field) {
-				$totalModsFields->push($field);
+		if($totalMods && $totalMods->exists()){
+			foreach ($totalMods as $modification) {
+				$modFields = $modification->getFormFields();
+				foreach ($modFields as $field) {
+					$totalModsFields->push($field);
+				}
 			}
 		}
 
 		//Payment fields
 		$supported_methods = PaymentProcessor::get_supported_methods();
-
 		$source = array();
 		foreach ($supported_methods as $methodName) {
 			$methodConfig = PaymentFactory::get_factory_config($methodName);
 			$source[$methodName] = $methodConfig['title'];
 		}
-
 		$paymentFields = CompositeField::create(
 			new HeaderField(_t('CheckoutPage.PAYMENT',"Payment"), 3),
 			DropDownField::create(
 				'PaymentMethod',
 				'Select Payment Method',
 				$source
-			)->setCustomValidationMessage(_t('CheckoutPage.SELECT_PAYMENT_METHOD',"Please select a payment method."))
+			)->setCustomValidationMessage(_t('CheckoutPage.SELECT_PAYMENT_METHOD',"Please select a payment method.")),
+			LiteralField::create('paymentoptions', '<div id="payment-load-area"></div>')
 		)->setName('PaymentFields');
-
-
+		
+		// Notes fields
+		$notesFields = CompositeField::create(
+			TextareaField::create('Notes', _t('CheckoutPage.NOTES_ABOUT_ORDER',"Notes about this order"))
+		)->setName('NotesFields');
+		
+		// Build the form fieldList
 		$fields = FieldList::create(
 			$itemFields,
 			$subTotalModsFields,
 			$totalModsFields,
-			$notesFields = CompositeField::create(
-				TextareaField::create('Notes', _t('CheckoutPage.NOTES_ABOUT_ORDER',"Notes about this order"))
-			)->setName('NotesFields'),
+			$notesFields,
 			$paymentFields
 		);
 
-		if (isset($personalFields)) {
-			// Removed as checkout hidden if not logged in already
-			//$fields->push($personalFields);
-		}
-
 		$this->extend('updateFields', $fields);
+		
 		$fields->setForm($this);
+		
 		return $fields;
 	}
 
