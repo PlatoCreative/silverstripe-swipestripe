@@ -111,6 +111,7 @@ class AccountPage_Controller extends Page_Controller {
 	 */
 	private static $allowed_actions = array (
 		'index',
+		'vieworders',
 		'order',
 		'repay',
 		'RepayForm'
@@ -131,17 +132,18 @@ class AccountPage_Controller extends Page_Controller {
 	 * @return Array Content data for displaying the page.
 	 */
 	function index() {
-		
-		Requirements::css('swipestripe/css/Shop.css');
-
-		return array( 
+		return $this->customise(array( 
 			'Content' => $this->Content, 
 			'Form' => $this->Form,
-			'Orders' => Order::get()
-				->where("MemberID = " . Convert::raw2sql(Member::currentUserID()))
-				->sort('Created DESC'),
+			'Orders' => Order::get()->where("MemberID = " . Convert::raw2sql(Member::currentUserID()))->sort('Created DESC'),
 			'Customer' => Customer::currentUser()
-		);
+		));
+	}
+	
+	function vieworders($request) {
+		return $this->customise(array(
+			'Orders' => Order::get()->where("MemberID = " . Convert::raw2sql(Member::currentUserID()))->sort('Created DESC')
+		));
 	}
 
 	/**
@@ -150,11 +152,7 @@ class AccountPage_Controller extends Page_Controller {
 	 * @return Array Content for displaying the page
 	 */
 	function order($request) {
-
-		Requirements::css('swipestripe/css/Shop.css');
-
-		if ($orderID = $request->param('ID')) {
-			
+		if($orderID = $request->param('ID')) {
 			$member = Customer::currentUser();
 			$order = Order::get()
 				->where("\"Order\".\"ID\" = " . Convert::raw2sql($orderID))
@@ -164,25 +162,20 @@ class AccountPage_Controller extends Page_Controller {
 				return $this->httpError(403, _t('AccountPage.NO_ORDER_EXISTS', 'Order does not exist.'));
 			}
 
-			if (!$order->canView($member)) {
+			if(!$order->canView($member)) {
 				return $this->httpError(403, _t('AccountPage.CANNOT_VIEW_ORDER', 'You cannot view orders that do not belong to you.'));
 			}
 
 			return array(
 				'Order' => $order
 			);
-		}
-		else {
+		} else {
 			return $this->httpError(403, _t('AccountPage.NO_ORDER_EXISTS', 'Order does not exist.'));
 		}
 	}
 	
 	function repay($request) {
-
-		Requirements::css('swipestripe/css/Shop.css');
-
-		if ($orderID = $request->param('ID')) {
-			
+		if ($orderID = $request->param('ID')) {			
 			$member = Customer::currentUser();
 			$order = Order::get()
 				->where("\"Order\".\"ID\" = " . Convert::raw2sql($orderID))
@@ -212,7 +205,6 @@ class AccountPage_Controller extends Page_Controller {
 	}
 
 	function RepayForm() {
-
 		$form = RepayForm::create(
 			$this, 
 			'RepayForm'
@@ -222,6 +214,5 @@ class AccountPage_Controller extends Page_Controller {
 		$form->populateFields();
 
 		return $form;
-	}
-	
+	}	
 }
