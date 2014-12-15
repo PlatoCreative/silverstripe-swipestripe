@@ -23,9 +23,6 @@
 	{
 		"silverstripe/sqlite3": "*"
 	},
-	"suggest": {
-		"frankmullenger/payment-cheque": "Simple payment method for testing"
-	},
 	"support": 
 	{
 		"email": "info@swipestripe.com",
