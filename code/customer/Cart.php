@@ -55,6 +55,12 @@ class Cart extends DataExtension {
 		return $order;
 	}
 	
+	// Return the total cart count
+	public function TotalItems(){
+		$items = $order->Items();
+		return $items ? $items->Count() : 0;
+	}
+	
 	/**
 	 * Convenience method to return links to cart related page.
 	 * 
@@ -107,5 +113,9 @@ class Cart extends DataExtension {
 			}
 		}
 		return $order;
+	}
+	
+	public static function getCustomer(){
+		return Customer::currentUser();
 	}
 }
