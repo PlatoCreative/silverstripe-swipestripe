@@ -21,6 +21,7 @@ class Product extends Page {
 	 */
 	private static $db = array(
 		'Price' => 'Decimal(19,8)',
+		'SpecialPrice' => 'Decimal(19,8)',
 		'Currency' => 'Varchar(3)',
 		'ShortDescription' => 'HTMLText',
 		'Stock' => 'Int'
@@ -36,11 +37,16 @@ class Product extends Page {
 		$shopConfig = ShopConfig::current_shop_config();
 
 		$amount = Price::create();
-		$amount->setAmount($this->Price);
+		if($this->SpecialPrice && $this->SpecialPrice > 0){
+			$price = $this->SpecialPrice;
+		} else {
+			$price = $this->Price;	
+		}
+		$amount->setAmount($price);
 		$amount->setCurrency($shopConfig->BaseCurrency);
 		$amount->setSymbol($shopConfig->BaseCurrencySymbol);
 
-		//Transform amount for applying discounts etc.
+		// Transform amount for applying discounts etc.
 		$this->extend('updateAmount', $amount);
 
 		return $amount;

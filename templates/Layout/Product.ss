@@ -19,7 +19,14 @@
 	
 	<div class="product-meta">
 		<h1>$Title</h1>
-		<h3 class="product-price-js">$Product.Price.Nice</h3>
+		<h3 class="product-price-js">
+			<% if Product.SpecialPrice %>
+				<span class="old-price">Was $Product.Price.Nice</span><br />
+				<span class="special-price">Now $Product.SpecialPrice.Nice</span>
+			<% else %>
+				$Product.Price.Nice
+			<% end_if %>
+		</h3>
 		<div id="product-message" class="message"></div>
 		<div class="add-to-cart">
 			$ProductForm(1, /cart)
