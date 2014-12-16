@@ -114,13 +114,17 @@ class AccountPage_Controller extends Page_Controller {
 		'vieworders',
 		'order',
 		'repay',
-		'RepayForm'
+		'RepayForm',
+		'RegisterAccount',
+		'RegisterAccountForm',
+		'EditAccount',
+		'EditAccountForm',
 	);
 	
 	public function init() {
 		parent::init();
-
-		if(!Permission::check('VIEW_ORDER')) {
+		$params = $this->getURLParams();
+		if(!Permission::check('VIEW_ORDER') && $params['Action'] != 'RegisterAccount' && $params['Action'] != 'RegisterAccountForm') {
 			return $this->redirect(Director::absoluteBaseURL() . 'Security/login?BackURL=' . urlencode($this->getRequest()->getVar('url')));
 		}
 	}
@@ -174,7 +178,7 @@ class AccountPage_Controller extends Page_Controller {
 		}
 	}
 	
-	function repay($request) {
+	function repay($request){
 		if ($orderID = $request->param('ID')) {			
 			$member = Customer::currentUser();
 			$order = Order::get()
@@ -214,5 +218,114 @@ class AccountPage_Controller extends Page_Controller {
 		$form->populateFields();
 
 		return $form;
-	}	
+	}
+	
+	/*
+	*	Register and edit account functionality
+	*/
+	
+	// Function for registering user account details
+	function RegisterAccount($request){
+		return $this->customise(array(
+			'Title' => 'Register an account',
+			'Content' => '',
+			'Form' => $this->RegisterAccountForm()
+		));
+	}
+	
+	// Form for registering account
+	function RegisterAccountForm(){		
+		$fields = FieldList::create(
+			TextField::create('FirstName', 'First Name', ''),
+			TextField::create('Surname', 'Surname', ''),
+			EmailField::create('Email', 'Email address', ''),
+			ConfirmedPasswordField::create('Password', 'Password', '')
+		);
+		
+		$required = RequiredFields::create('FirstName', 'Surname', 'Email', 'Password');		
+		
+		$this->extend('updateRegisterAccountFields', $fields, $customer, $required);
+		
+		$actions = FieldList::create(
+			FormAction::create('doRegisterAccount', 'Create')
+		);
+		
+		return Form::create($this, 'RegisterAccountForm', $fields, $actions, $required);
+	}
+	
+	// Update the users account
+	function doRegisterAccount($data, $form){
+		//Save or create a new customer/member
+		$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
+		
+		if(!$member->exists()){
+			$existingCustomer = Customer::get()->where("\"Email\" = '".$data['Email']."'");
+			// does the customer already exist?
+			if ($existingCustomer && $existingCustomer->exists()) {
+				$form->sessionMessage(
+					_t('CheckoutPage.MEMBER_ALREADY_EXISTS', 'Sorry, a member already exists with that email address. If this is your email address, please log in first before placing your order.'),
+					'bad'
+				);
+			} else {
+				// no they don't so create them and log them in.
+				$member = Customer::create();
+				$form->saveInto($member);
+				$member->write();
+				$member->addToGroupByCode('customers');
+				$member->logIn();
+			}		
+		}
+		
+		$this->extend('updateAccountRegister', $data, $customer);
+		
+		$form->sessionMessage('Account created successfully', 'good');
+		
+		return Controller::curr()->redirect("/Account");
+	}
+	
+	// Function for updating user account details
+	function EditAccount($request){
+		return $this->customise(array(
+			'Title' => 'Edit your account details',
+			'Content' => '',
+			'Form' => $this->EditAccountForm()
+		));
+	}
+	
+	// Form for editing account
+	function EditAccountForm(){
+		$customer = Customer::currentUser();
+		
+		$fields = FieldList::create(
+			TextField::create('FirstName', 'First Name', $customer->FirstName),
+			TextField::create('Surname', 'Surname', $customer->Surname),
+			EmailField::create('Email', 'Email address', $customer->Email),
+			ConfirmedPasswordField::create('Password', 'Password', $customer->Password, $this, true)
+		);
+		
+		$required = RequiredFields::create('FirstName', 'Surname', 'Email', 'Password');		
+		
+		$this->extend('updateEditAccountFields', $fields, $customer, $required);
+		
+		$actions = FieldList::create(
+			FormAction::create('doEditAccount', 'Update')
+		);
+		
+		return Form::create($this, 'EditAccountForm', $fields, $actions, $required);
+	}
+	
+	// Update the users account
+	function doEditAccount($data, $form){
+		$customer = Customer::currentUser();
+		
+		if($customer->exists()){	
+			$form->saveInto($customer);
+	
+			$this->extend('updateAccountEdit', $data, $customer);
+			
+			$customer->write();
+		}
+		
+		return $this->redirectBack();
+	}
 }
