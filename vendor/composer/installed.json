@@ -1,0 +1,362 @@
+[
+    {
+        "name": "composer/installers",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/composer/installers.git",
+            "reference": "89d77bfbee79e16653f7162c86e602cc188471db"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/composer/installers/zipball/89d77bfbee79e16653f7162c86e602cc188471db",
+            "reference": "89d77bfbee79e16653f7162c86e602cc188471db",
+            "shasum": ""
+        },
+        "replace": {
+            "roundcube/plugin-installer": "*",
+            "shama/baton": "*"
+        },
+        "require-dev": {
+            "composer/composer": "1.0.*@dev",
+            "phpunit/phpunit": "4.1.*"
+        },
+        "time": "2014-11-29 01:29:17",
+        "type": "composer-installer",
+        "extra": {
+            "class": "Composer\\Installers\\Installer",
+            "branch-alias": {
+                "dev-master": "1.0-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Composer\\Installers\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Kyle Robinson Young",
+                "email": "kyle@dontkry.com",
+                "homepage": "https://github.com/shama"
+            }
+        ],
+        "description": "A multi-framework Composer library installer",
+        "homepage": "http://composer.github.com/installers/",
+        "keywords": [
+            "Craft",
+            "Dolibarr",
+            "Hurad",
+            "MODX Evo",
+            "OXID",
+            "Thelia",
+            "WolfCMS",
+            "agl",
+            "annotatecms",
+            "bitrix",
+            "cakephp",
+            "chef",
+            "codeigniter",
+            "concrete5",
+            "croogo",
+            "dokuwiki",
+            "drupal",
+            "elgg",
+            "fuelphp",
+            "grav",
+            "installer",
+            "joomla",
+            "kohana",
+            "laravel",
+            "lithium",
+            "magento",
+            "mako",
+            "mediawiki",
+            "modulework",
+            "moodle",
+            "phpbb",
+            "piwik",
+            "ppi",
+            "puppet",
+            "roundcube",
+            "shopware",
+            "silverstripe",
+            "symfony",
+            "typo3",
+            "wordpress",
+            "zend",
+            "zikula"
+        ]
+    },
+    {
+        "name": "silverstripe/framework",
+        "version": "3.1.x-dev",
+        "version_normalized": "3.1.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/silverstripe/silverstripe-framework.git",
+            "reference": "644f38f2d6cd83fdbfe520d5f1e62e953ce8c5cf"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/silverstripe/silverstripe-framework/zipball/644f38f2d6cd83fdbfe520d5f1e62e953ce8c5cf",
+            "reference": "644f38f2d6cd83fdbfe520d5f1e62e953ce8c5cf",
+            "shasum": ""
+        },
+        "require": {
+            "composer/installers": "*",
+            "php": ">=5.3.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~3.7@stable"
+        },
+        "time": "2014-12-11 19:30:39",
+        "type": "silverstripe-module",
+        "installation-source": "source",
+        "autoload": {
+            "classmap": [
+                "tests/behat/features/bootstrap"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "SilverStripe",
+                "homepage": "http://silverstripe.com"
+            },
+            {
+                "name": "The SilverStripe Community",
+                "homepage": "http://silverstripe.org"
+            }
+        ],
+        "description": "The SilverStripe framework",
+        "homepage": "http://silverstripe.org",
+        "keywords": [
+            "framework",
+            "silverstripe"
+        ]
+    },
+    {
+        "name": "silverstripe/cms",
+        "version": "3.1.x-dev",
+        "version_normalized": "3.1.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/silverstripe/silverstripe-cms.git",
+            "reference": "19f337b544ee8aa9bfd6ba453f8b08de8d88a0f3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/silverstripe/silverstripe-cms/zipball/19f337b544ee8aa9bfd6ba453f8b08de8d88a0f3",
+            "reference": "19f337b544ee8aa9bfd6ba453f8b08de8d88a0f3",
+            "shasum": ""
+        },
+        "require": {
+            "composer/installers": "*",
+            "php": ">=5.3.2",
+            "silverstripe/framework": "3.1.*"
+        },
+        "time": "2014-12-03 02:32:33",
+        "type": "silverstripe-module",
+        "installation-source": "source",
+        "autoload": {
+            "classmap": [
+                "tests/behat/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "SilverStripe",
+                "homepage": "http://silverstripe.com"
+            },
+            {
+                "name": "The SilverStripe Community",
+                "homepage": "http://silverstripe.org"
+            }
+        ],
+        "description": "The SilverStripe Content Management System",
+        "homepage": "http://silverstripe.org",
+        "keywords": [
+            "cms",
+            "silverstripe"
+        ]
+    },
+    {
+        "name": "icecaster/versioned-gridfield",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/icecaster/silverstripe-versioned-gridfield.git",
+            "reference": "3068fdda50f8d1dfe9d39fcc59c5b45e882a78b8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/icecaster/silverstripe-versioned-gridfield/zipball/3068fdda50f8d1dfe9d39fcc59c5b45e882a78b8",
+            "reference": "3068fdda50f8d1dfe9d39fcc59c5b45e882a78b8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "silverstripe/cms": "~3.1",
+            "silverstripe/framework": "~3.1"
+        },
+        "time": "2014-11-10 05:45:57",
+        "type": "silverstripe-module",
+        "installation-source": "source",
+        "notification-url": "https://packagist.org/downloads/",
+        "description": "VersionedGridFieldDetailForm, for managing Sitetree (or any other versioned objects) in CMS interfaces, such as ModelAdmin",
+        "keywords": [
+            "blog",
+            "gridfield",
+            "silverstripe"
+        ]
+    },
+    {
+        "name": "undefinedoffset/sortablegridfield",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/UndefinedOffset/SortableGridField.git",
+            "reference": "946ca8dc9b32a039f9bcedc774af96dd3871c758"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/UndefinedOffset/SortableGridField/zipball/946ca8dc9b32a039f9bcedc774af96dd3871c758",
+            "reference": "946ca8dc9b32a039f9bcedc774af96dd3871c758",
+            "shasum": ""
+        },
+        "require": {
+            "composer/installers": "*",
+            "silverstripe/framework": ">=3.0.1,<3.2"
+        },
+        "time": "2014-10-27 13:14:05",
+        "type": "silverstripe-module",
+        "extra": {
+            "installer-name": "sortablegridfield"
+        },
+        "installation-source": "source",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Ed Chipman",
+                "homepage": "http://www.edchipman.ca",
+                "role": "Developer"
+            }
+        ],
+        "description": "Adds drag and drop functionality to SilverStripe 3.0's GridField",
+        "keywords": [
+            "gridfield",
+            "silverstripe"
+        ]
+    },
+    {
+        "name": "silverstripe/sqlite3",
+        "version": "1.3.x-dev",
+        "version_normalized": "1.3.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/silverstripe-labs/silverstripe-sqlite3.git",
+            "reference": "6bb7d5a5f6ddc137c34d501ebb65442f634cf624"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/silverstripe-labs/silverstripe-sqlite3/zipball/6bb7d5a5f6ddc137c34d501ebb65442f634cf624",
+            "reference": "6bb7d5a5f6ddc137c34d501ebb65442f634cf624",
+            "shasum": ""
+        },
+        "require": {
+            "silverstripe/framework": ">=3.0,<3.2"
+        },
+        "time": "2014-10-27 20:53:23",
+        "type": "silverstripe-module",
+        "installation-source": "source",
+        "notification-url": "https://packagist.org/downloads/",
+        "authors": [
+            {
+                "name": "Sean Harvey",
+                "email": "sean@silverstripe.com"
+            },
+            {
+                "name": "Ingo Schommer",
+                "email": "ingo@silverstripe.com"
+            }
+        ],
+        "description": "Adds SQLite3 support to SilverStripe",
+        "keywords": [
+            "database",
+            "silverstripe",
+            "sqlite3"
+        ]
+    },
+    {
+        "name": "silverstripe/payment",
+        "version": "1.0.x-dev",
+        "version_normalized": "1.0.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/silverstripe-labs/silverstripe-payment.git",
+            "reference": "65dfbe47e3ca6875fa61deabe7565fa11eac722a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/silverstripe-labs/silverstripe-payment/zipball/65dfbe47e3ca6875fa61deabe7565fa11eac722a",
+            "reference": "65dfbe47e3ca6875fa61deabe7565fa11eac722a",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "silverstripe/cms": "3.*",
+            "silverstripe/framework": "3.*"
+        },
+        "time": "2013-11-21 08:32:53",
+        "type": "silverstripe-module",
+        "installation-source": "source",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Ryan Dao",
+                "homepage": "https://github.com/ryandao",
+                "role": "Developer"
+            },
+            {
+                "name": "Frank Mullenger",
+                "homepage": "https://github.com/frankmullenger",
+                "role": "Developer"
+            },
+            {
+                "name": "Jeremy Shipman",
+                "homepage": "https://github.com/jedateach",
+                "role": "Developer"
+            }
+        ],
+        "description": "SilverStripe Payment Module",
+        "keywords": [
+            "payment",
+            "silverstripe"
+        ],
+        "support": {
+            "source": "https://github.com/silverstripe-labs/silverstripe-payment/tree/1.0",
+            "issues": "https://github.com/silverstripe-labs/silverstripe-payment/issues"
+        }
+    }
+]
