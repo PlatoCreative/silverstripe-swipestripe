@@ -20,11 +20,11 @@
 	<div class="product-meta">
 		<h1>$Title</h1>
 		<h3 class="product-price-js">
-			<% if Product.SpecialPrice %>
-				<span class="old-price">Was $Product.Price.Nice</span><br />
-				<span class="special-price">Now $Product.SpecialPrice.Nice</span>
+			<% if Product.OnSpecial() %>
+				<span class="old-price">Was $Price.Nice</span><br />
+				<span class="special-price">Now $SpecialPrice.Nice</span>
 			<% else %>
-				$Product.Price.Nice
+				$Price.Nice
 			<% end_if %>
 		</h3>
 		<div id="product-message" class="message"></div>

@@ -26,7 +26,11 @@ class Product extends Page {
 		'ShortDescription' => 'HTMLText',
 		'Stock' => 'Int'
 	);
-
+	
+	public function OnSpecial(){
+		return ($this->SpecialPrice > 0) ? true : false;
+	}
+	
 	/**
 	 * Actual price in base currency, can decorate to apply discounts etc.
 	 * 
@@ -37,11 +41,7 @@ class Product extends Page {
 		$shopConfig = ShopConfig::current_shop_config();
 
 		$amount = Price::create();
-		if($this->SpecialPrice && $this->SpecialPrice > 0){
-			$price = $this->SpecialPrice;
-		} else {
-			$price = $this->Price;	
-		}
+		$price = $this->OnSpecial() ? $this->SpecialPrice : $this->Price;
 		$amount->setAmount($price);
 		$amount->setCurrency($shopConfig->BaseCurrency);
 		$amount->setSymbol($shopConfig->BaseCurrencySymbol);
@@ -207,7 +207,10 @@ class Product extends Page {
 		$categories = ProductCategory::getAllCategories();		
 		if($categories){
 			// Product fields
-			$fields->addFieldToTab('Root.Main', PriceField::create('Price'), 'Content');
+			$fields->addFieldsToTab('Root.Main', array(
+				PriceField::create('Price', 'Standard Price'),
+				PriceField::create('SpecialPrice', 'Special Price')->setRightTitle('If price set to 0.00 the product will not be on special')
+			), 'Content');
 	
 			// Replace URL Segment field
 			/*
