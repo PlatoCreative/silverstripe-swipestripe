@@ -167,6 +167,7 @@ class CheckoutPage_Controller extends Page_Controller {
 	/*
 	*	Register form before checkout
 	*/
+	/*
 	public function RegistrationForm(){
 		$fields = new FieldList(
 			new CompositeField(
@@ -194,10 +195,12 @@ class CheckoutPage_Controller extends Page_Controller {
 			))
 		);	
 	}
-
+	*/
+	
 	/*
 	*	Do Member Registration
 	*/
+	/*
 	public function register($data, $form) {
 		//Save or create a new customer/member
 		$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
@@ -221,4 +224,5 @@ class CheckoutPage_Controller extends Page_Controller {
 		
 		return Controller::curr()->redirect("/Checkout");
 	}
+	*/
 }

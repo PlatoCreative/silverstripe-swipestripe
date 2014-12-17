@@ -92,6 +92,13 @@ class AccountPage extends Page {
 		$fields->removeByName('ClassName');
 		return $fields;
 	}
+	
+	// Returns the small registration form from the controller
+	function SmallRegisterAccountForm(){
+		$class = $this->ClassName . "_Controller";
+        $controller = new $class($this);
+        return $controller->SmallRegisterAccountForm();
+	}
 }
 
 /**
@@ -115,6 +122,7 @@ class AccountPage_Controller extends Page_Controller {
 		'order',
 		'repay',
 		'RepayForm',
+		'SmallRegisterAccountForm',
 		'RegisterAccount',
 		'RegisterAccountForm',
 		'EditAccount',
@@ -124,8 +132,10 @@ class AccountPage_Controller extends Page_Controller {
 	public function init() {
 		parent::init();
 		$params = $this->getURLParams();
-		if(!Permission::check('VIEW_ORDER') && $params['Action'] != 'RegisterAccount' && $params['Action'] != 'RegisterAccountForm') {
-			return $this->redirect(Director::absoluteBaseURL() . 'Security/login?BackURL=' . urlencode($this->getRequest()->getVar('url')));
+		if($params['Action'] != 'RegisterAccount' && $params['Action'] != 'RegisterAccountForm') {
+			if(!Permission::check('VIEW_ORDER')){
+				return $this->redirect(Director::absoluteBaseURL() . 'Security/login?BackURL=' . urlencode($this->getRequest()->getVar('url')));
+			}
 		}
 	}
 	
@@ -224,30 +234,57 @@ class AccountPage_Controller extends Page_Controller {
 	*	Register and edit account functionality
 	*/
 	
-	// Function for registering user account details
-	function RegisterAccount($request){
-		return $this->customise(array(
-			'Title' => 'Register an account',
-			'Content' => '',
-			'Form' => $this->RegisterAccountForm()
-		));
-	}
-	
-	// Form for registering account
-	function RegisterAccountForm(){		
+	// Small form for embedding on security and checkout pages
+	function SmallRegisterAccountForm(){
 		$fields = FieldList::create(
 			TextField::create('FirstName', 'First Name', ''),
 			TextField::create('Surname', 'Surname', ''),
-			EmailField::create('Email', 'Email address', ''),
+			EmailField::create('Email', 'Email address', '')
+		);	
+		
+		$this->extend('updateSmallRegisterAccountFields', $fields);
+		
+		$actions = FieldList::create(
+			FormAction::create('RegisterAccount', 'Register Now')
+		);
+		
+		return Form::create($this, 'SmallRegisterAccountForm', $fields, $actions)->setFormAction($this->Link() . '/RegisterAccount')->setFormMethod('GET');
+	}
+	
+	// Function for registering user account details
+	function RegisterAccount($request){
+		$params = $this->request->getVars();
+		if(Director::is_ajax()){
+			return $this->RegisterAccountForm($params);
+		} else {
+			$this->customise(array(
+				'Title' => 'Register an account',
+				'Content' => '',
+				'Form' => $this->RegisterAccountForm($params)
+			));
+			return $this->renderWith(array('AccountPage_GeneralForm', 'Page'));
+		}
+	}
+	
+	// Form for registering account
+	function RegisterAccountForm($params){		
+		$fields = FieldList::create(
+			TextField::create('FirstName', 'First Name', $params['FirstName']),
+			TextField::create('Surname', 'Surname', $params['Surname']),
+			EmailField::create('Email', 'Email address', $params['Email']),
 			ConfirmedPasswordField::create('Password', 'Password', '')
 		);
 		
+		if(isset($params['Redirect'])){
+			$fields->push(HiddenField::create('Redirect', '', $params['Redirect']));
+		}
+		
 		$required = RequiredFields::create('FirstName', 'Surname', 'Email', 'Password');		
 		
-		$this->extend('updateRegisterAccountFields', $fields, $customer, $required);
+		$this->extend('updateRegisterAccountFields', $fields, $required);
 		
 		$actions = FieldList::create(
-			FormAction::create('doRegisterAccount', 'Create')
+			FormAction::create('doRegisterAccount', 'Register')
 		);
 		
 		return Form::create($this, 'RegisterAccountForm', $fields, $actions, $required);
@@ -259,11 +296,11 @@ class AccountPage_Controller extends Page_Controller {
 		$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
 		
 		if(!$member->exists()){
-			$existingCustomer = Customer::get()->where("\"Email\" = '".$data['Email']."'");
+			$existingCustomer = Customer::get()->where("\"Email\" = '" . $data['Email'] . "'");
 			// does the customer already exist?
 			if ($existingCustomer && $existingCustomer->exists()) {
 				$form->sessionMessage(
-					_t('CheckoutPage.MEMBER_ALREADY_EXISTS', 'Sorry, a member already exists with that email address. If this is your email address, please log in first before placing your order.'),
+					_t('AccountPage.MEMBER_ALREADY_EXISTS', 'Sorry, a member already exists with that email address. If this is your email address, please log in first before placing your order.'),
 					'bad'
 				);
 			} else {
@@ -276,20 +313,29 @@ class AccountPage_Controller extends Page_Controller {
 			}		
 		}
 		
-		$this->extend('updateAccountRegister', $data, $customer);
+		$this->extend('updateAccountRegister', $data, $member);
 		
 		$form->sessionMessage('Account created successfully', 'good');
 		
-		return Controller::curr()->redirect("/Account");
+		if(isset($data['Redirect'])){
+			if(Director::is_ajax()){
+				return $data['Redirect'];	
+			} else {
+				return Controller::curr()->redirect($data['Redirect']);
+			}
+		} else {
+			return Controller::curr()->redirect("/Account");
+		}
 	}
 	
 	// Function for updating user account details
 	function EditAccount($request){
-		return $this->customise(array(
+		$this->customise(array(
 			'Title' => 'Edit your account details',
 			'Content' => '',
 			'Form' => $this->EditAccountForm()
 		));
+		return $this->renderWith(array('AccountPage_GeneralForm', 'Page'));
 	}
 	
 	// Form for editing account

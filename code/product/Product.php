@@ -188,7 +188,7 @@ class Product extends Page {
 	 */
 	public function onAfterDelete() {
 		parent::onAfterDelete();
-	
+		
 		if($this->isPublished()) {
 			$this->doUnpublish();
 		}

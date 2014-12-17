@@ -118,4 +118,8 @@ class Cart extends DataExtension {
 	public static function getCustomer(){
 		return Customer::currentUser();
 	}
+	
+	public function AccountPage(){
+		return AccountPage::get()->first();	
+	}
 }

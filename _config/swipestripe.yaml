@@ -34,3 +34,7 @@ LeftAndMain:
 Page_Controller:
   extensions: 
     - 'Cart'
+
+Security:
+  extensions: 
+    - 'Cart'

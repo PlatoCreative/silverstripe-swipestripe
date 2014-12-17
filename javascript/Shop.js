@@ -165,4 +165,44 @@ jQuery(document).ready(function($) {
 			});
 		});
 	});
+	
+	/* CHECKOUT PAGE */
+	if($('.CheckoutPage').length > 0){
+		// Post small register form
+		$('#Form_SmallRegisterAccountForm').submit(function(e){
+			e.preventDefault();
+			
+			var redirect = '/checkout';
+			
+			// Add the product to the cart
+			$.ajax({
+				type : "GET",
+				url : $(this).attr('action'),
+				data : $(this).serialize() + '&Redirect=' + redirect,
+				cache : false,
+				success : function(data){
+					$('#ordeform-wrapper').stop().animate({'opacity' : 0}, 500, function(){
+						$(this).html(data).stop().animate({'opacity' : 1}, 500);
+						$('body').on('submit', '#Form_RegisterAccountForm', function(e){
+							e.preventDefault();
+							$('#ordeform-wrapper').stop().animate({'opacity' : 0}, 500);
+							$.ajax({
+								type : "POST",
+								url : $(this).attr('action'),
+								data : $(this).serialize(),
+								cache : false,
+								success : function(data){
+									if(data == redirect){
+										window.location = window.location.origin + redirect;
+									} else {
+										$('#ordeform-wrapper').html(data).stop().animate({'opacity' : 1}, 500);
+									}
+								}
+							});
+						});
+					});
+				}
+			});
+		});
+	}
 });
