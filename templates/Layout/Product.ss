@@ -4,14 +4,14 @@
 			<div id="product-gallery">
 				<div id="product-main-image">
 					<% with Images.First %>
-						<img src="$Image.SetWidth(400).URL" alt="$Title" />
+						<img src="$Image.SetWidth(400).URL" alt="$Image.Title" />
 					<% end_with %>
 				</div>
 				
 				<div id="product-images-small">
 					<% loop Images %>
 						<a href="$Image.SetRatioSize(800,600).URL" title="Click to enlarge">
-							<img src="$Image.CroppedImage(100,100).URL" alt="$Title" />
+							<img src="$Image.CroppedImage(100,100).URL" alt="$Image.Title" />
 						</a>
 					<% end_loop %>
 				</div>

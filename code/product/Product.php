@@ -180,7 +180,7 @@ class Product extends Page implements HiddenClass {
 		if($this->Images() && $images = $this->Images()){
 			foreach($images as $image){
 				if($image->exists()){
-					$image->delete();	
+					$image->delete();
 				}
 			}
 		}
