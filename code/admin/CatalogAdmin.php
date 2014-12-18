@@ -130,7 +130,7 @@ class CatalogAdmin extends ModelAdmin {
 
 		// Validation
 		if(singleton($this->modelClass)->hasMethod('getCMSValidator')) {
-			if($listField->Type() != 'literal'){
+			if($listField->Type() != 'readonly'){
 				$detailValidator = singleton($this->modelClass)->getCMSValidator();
 				$listField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
 			}
