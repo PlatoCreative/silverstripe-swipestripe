@@ -201,7 +201,7 @@ class Product extends Page implements HiddenClass {
 	
 	public function canView($member = null){
 		$extended = $this->extendedCan(__FUNCTION__, $member);
-		if($extended !== null) {
+		if($extended !== null){
 			return $extended;
 		}
 		return Permission::check('ADMIN', 'any', $member);
