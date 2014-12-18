@@ -35,10 +35,10 @@ class ProductImage extends DataObject {
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 		
-		$fields->addFieldsToTab('Root', array(
+		$fields = FieldList::create(
 			TextField::create('Title', 'Title'),
 			UploadField::create('Image', 'Upload an image')->setFolderName('ProductImages')
-		));
+		);
 		
 		return $fields;
 	}
