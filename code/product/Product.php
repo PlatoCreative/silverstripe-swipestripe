@@ -154,8 +154,7 @@ class Product extends Page implements HiddenClass {
 	/** 
 	* @see SiteTree::onAfterPublish()
 	*/
-	public function onAfterPublish(){
-		
+	public function onAfterPublish(){		
 		$this->ParentID = -1;
 		
 		//Save in base currency
@@ -198,6 +197,14 @@ class Product extends Page implements HiddenClass {
 		if($this->isPublished()) {
 			$this->doUnpublish();
 		}
+	}
+	
+	public function canView($member = null){
+		$extended = $this->extendedCan(__FUNCTION__, $member);
+		if($extended !== null) {
+			return $extended;
+		}
+		return Permission::check('ADMIN', 'any', $member);
 	}
 	
 	public function canAddChildren($member = null){
