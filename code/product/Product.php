@@ -140,8 +140,12 @@ class Product extends Page {
 		$this->Currency = $shopConfig->BaseCurrency;
 		
 		// Check for main category ID and the categories list
+		$tableName = "SiteTree.ID";
+		if($this->ID){
+			$tableName = "SiteTree_Live.ID";
+		}
 		$productCategories = $this->ProductCategories();
-		$maincat = ProductCategory::get()->where("SiteTree_Live.ID =" . $this->MainCategoryID)->first();
+		$maincat = ProductCategory::get()->where($tableName . " = " . $this->MainCategoryID)->first();
 		if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
 			$productCategories->add($maincat);
 		}
