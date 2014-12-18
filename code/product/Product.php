@@ -147,21 +147,26 @@ class Product extends Page {
 	public function onBeforePublish(){
 		// Fixes the can't find stage issue
 		if($this->stagesDiffer('Stage', 'Live')){
-			$this->writeToStage('Stage');
-			
-			$this->ParentID = -1;
-			
-			//Save in base currency
-			$shopConfig = ShopConfig::current_shop_config();
-			$this->Currency = $shopConfig->BaseCurrency;
-			
-			// Check for main category ID and the categories list
-			$productCategories = $this->ProductCategories();
-			$maincat = ProductCategory::get()->where("SiteTree_Live.ID =" . $this->MainCategoryID)->first();
-			if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
-				$productCategories->add($maincat);
-			}
-			
+			$this->writeToStage('Stage');		
+		}
+	}
+	
+	/** 
+	* @see SiteTree::onAfterPublish()
+	*/
+	public function onAfterPublish(){
+		
+		$this->ParentID = -1;
+		
+		//Save in base currency
+		$shopConfig = ShopConfig::current_shop_config();
+		$this->Currency = $shopConfig->BaseCurrency;
+		
+		// Check for main category ID and the categories list
+		$productCategories = $this->ProductCategories();
+		$maincat = ProductCategory::get()->where("SiteTree.ID =" . $this->MainCategoryID)->first();
+		if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
+			$productCategories->add($maincat);
 		}
 	}
 	
