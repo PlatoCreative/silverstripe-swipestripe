@@ -110,7 +110,6 @@ class CheckoutPage_Controller extends Page_Controller {
 	private static $allowed_actions = array (
 		'index',
 		'OrderForm',
-		'RegistrationForm',
 		'LoginForm',
 		'login'
 	);
@@ -163,66 +162,4 @@ class CheckoutPage_Controller extends Page_Controller {
 
 		return $form;
 	}
-	
-	/*
-	*	Register form before checkout
-	*/
-	/*
-	public function RegistrationForm(){
-		$fields = new FieldList(
-			new CompositeField(
-				EmailField::create('Email', _t('CheckoutPage.EMAIL', 'Email'))
-					->setCustomValidationMessage(_t('CheckoutPage.PLEASE_ENTER_EMAIL_ADDRESS', "Please enter your email address."))
-			),
-			new CompositeField(
-				new FieldGroup(
-					new ConfirmedPasswordField('Password', _t('CheckoutPage.PASSWORD', "Password"))
-				)
-			)
-		);
-		
-		$actions = new FieldList(
-			FormAction::create("register", 'Register')
-		);
-		
-		return Form::create(
-			$this,
-			"RegistrationForm",
-			$fields,
-			FieldList::create(FormAction::create('register', 'Register')),
-			RequiredFields::create(array(
-				'Email'
-			))
-		);	
-	}
-	*/
-	
-	/*
-	*	Do Member Registration
-	*/
-	/*
-	public function register($data, $form) {
-		//Save or create a new customer/member
-		$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
-		if(!$member->exists()){
-			$existingCustomer = Customer::get()->where("\"Email\" = '".$data['Email']."'");
-			// does the customer already exist?
-			if ($existingCustomer && $existingCustomer->exists()) {
-				$form->sessionMessage(
-					_t('CheckoutPage.MEMBER_ALREADY_EXISTS', 'Sorry, a member already exists with that email address. If this is your email address, please log in first before placing your order.'),
-					'bad'
-				);
-			} else {
-				// no they don't so create them and log them in.
-				$member = Customer::create();
-				$form->saveInto($member);
-				$member->write();
-				$member->addToGroupByCode('customers');
-				$member->logIn();
-			}		
-		}
-		
-		return Controller::curr()->redirect("/Checkout");
-	}
-	*/
 }
