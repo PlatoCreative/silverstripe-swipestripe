@@ -125,13 +125,15 @@ class CatalogAdmin extends ModelAdmin {
 		
 		$categories = ProductCategory::getAllCategories();
 		if($this->modelClass == 'Product' && !$categories){
-			$listField = new LiteralField('CategoryWarning', '<p class="message warning">Please create a category in the site tree before creating products.</p>');	
+			$listField = LiteralField::create('CategoryWarning', '<p class="message warning">Please create a category in the site tree before creating products.</p>');	
 		}
 
 		// Validation
 		if(singleton($this->modelClass)->hasMethod('getCMSValidator')) {
-			$detailValidator = singleton($this->modelClass)->getCMSValidator();
-			$listField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
+			if($listField->Type() != 'literal'){
+				$detailValidator = singleton($this->modelClass)->getCMSValidator();
+				$listField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
+			}
 		}
 
 		$form = new Form(
