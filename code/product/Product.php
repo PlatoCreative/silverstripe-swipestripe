@@ -200,6 +200,8 @@ class Product extends Page implements HiddenClass {
 	}
 	
 	public function canView($member = null){
+		return true;
+		// TODO FIX THIS
 		$extended = $this->extendedCan(__FUNCTION__, $member);
 		if($extended !== null){
 			return $extended;
