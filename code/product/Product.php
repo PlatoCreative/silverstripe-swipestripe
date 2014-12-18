@@ -6,7 +6,7 @@
  * when a Product is added to an Order, then subsequently changed, the Order can get the correct
  * details about the Product.
  */
-class Product extends Page {
+class Product extends Page implements HiddenClass {
 	/**
 	 * Flag for denoting if this is the first time this Product is being written.
 	 * 
@@ -193,6 +193,10 @@ class Product extends Page {
 		if($this->isPublished()) {
 			$this->doUnpublish();
 		}
+	}
+	
+	public function canAddChildren($member = null){
+		return false;	
 	}
 		
 	/**
