@@ -141,7 +141,7 @@ class Product extends Page {
 		
 		// Check for main category ID and the categories list
 		$productCategories = $this->ProductCategories();
-		$maincat = ProductCategory::get()->filter('ID', $this->MainCategoryID)->first(); 
+		$maincat = ProductCategory::get()->where("SiteTree_Live.ID =" . $this->MainCategoryID)->first();
 		if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
 			$productCategories->add($maincat);
 		}
