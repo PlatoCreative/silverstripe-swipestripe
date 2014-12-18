@@ -132,30 +132,13 @@ class Product extends Page {
 	 */
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		// Force product to never be in the sitetree
-		$this->ParentID = -1;
-
-		//Save in base currency
-		$shopConfig = ShopConfig::current_shop_config();
-		$this->Currency = $shopConfig->BaseCurrency;
-		
-		// Check for main category ID and the categories list
-		$tableName = "SiteTree.ID";
-		if($this->ID){
-			$tableName = "SiteTree_Live.ID";
-		}
-		$productCategories = $this->ProductCategories();
-		$maincat = ProductCategory::get()->where($tableName . " = " . $this->MainCategoryID)->first();
-		if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
-			$productCategories->add($maincat);
-		}
 	}
 	
 	/** 
 	 * @see SiteTree::onAfterWrite()
 	 */
 	public function onAfterWrite() {
-		parent::onAfterWrite();
+		parent::onAfterWrite();		
 	}
 	
 	/** 
@@ -165,6 +148,20 @@ class Product extends Page {
 		// Fixes the can't find stage issue
 		if($this->stagesDiffer('Stage', 'Live')){
 			$this->writeToStage('Stage');
+			
+			$this->ParentID = -1;
+			
+			//Save in base currency
+			$shopConfig = ShopConfig::current_shop_config();
+			$this->Currency = $shopConfig->BaseCurrency;
+			
+			// Check for main category ID and the categories list
+			$productCategories = $this->ProductCategories();
+			$maincat = ProductCategory::get()->where("SiteTree_Live.ID =" . $this->MainCategoryID)->first();
+			if($this->isInDB() && !in_array($maincat->ID, array_keys($productCategories->map()->toArray()))) {
+				$productCategories->add($maincat);
+			}
+			
 		}
 	}
 	
