@@ -40,10 +40,7 @@
 			
 			<% if SubTotalModifications %>
 				<% loop SubTotalModifications %>
-					<tr>
-						<td class="row-header mod-title">$Description</td>
-						<td class="totals-column" colspan="3">$Price.Nice</td>
-					</tr>
+					$ShowOrderModification()
 				<% end_loop %>
 			<% end_if %>
 			
@@ -54,10 +51,7 @@
 			
 			<% if TotalModifications %>
 				<% loop TotalModifications %>
-					<tr>
-						<td class="row-header mod-title">$Description</td>
-						<td class="totals-column" colspan="3">$Price.Nice</td>
-					</tr>
+					$ShowOrderModification()
 				<% end_loop %>
 			<% end_if %>
 	

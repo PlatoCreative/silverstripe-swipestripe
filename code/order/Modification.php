@@ -62,7 +62,6 @@ class Modification extends DataObject {
 	}
 
 	public function Amount() {
-
 		// TODO: Multi currency
 		$order = $this->Order();
 
@@ -79,7 +78,6 @@ class Modification extends DataObject {
 	 * @return Price
 	 */
 	public function Price() {
-		
 		$amount = $this->Amount();
 		$this->extend('updatePrice', $amount);
 		return $amount;
@@ -93,4 +91,8 @@ class Modification extends DataObject {
 		return new FieldList();
 	}
 	
+	public function ShowOrderModification(){
+		$template = $this->SubTotalModifier ? 'Order_SubTotalModification' : 'Order_TotalModification';
+		return $this->renderWith(array($template . '_' . $this->ClassName, $template));
+	}
 }

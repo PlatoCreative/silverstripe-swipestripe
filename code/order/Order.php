@@ -328,11 +328,11 @@ class Order extends DataObject implements PermissionProvider {
 	 */
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
+		$shopConfig = ShopConfig::current_shop_config();
 		if (!$this->ID) $this->LastActive = SS_Datetime::now()->getValue();
 
 		//Set the base currency
 		if (!$this->BaseCurrency || !$this->BaseCurrencySymbol) {
-			$shopConfig = ShopConfig::current_shop_config();
 			$this->BaseCurrency = $shopConfig->BaseCurrency;
 			$this->BaseCurrencySymbol = $shopConfig->BaseCurrencySymbol;
 		}
