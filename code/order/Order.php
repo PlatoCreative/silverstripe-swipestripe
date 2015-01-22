@@ -116,7 +116,8 @@ class Order extends DataObject implements PermissionProvider {
 	 * @var Array
 	 */
 	private static $has_one = array(
-		'Member' => 'Customer'
+		'Member' => 'Customer',
+		'ShopConfig' => 'ShopConfig'
 	);
 
 	/*
@@ -329,6 +330,9 @@ class Order extends DataObject implements PermissionProvider {
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
 		$shopConfig = ShopConfig::current_shop_config();
+		
+		$this->ShopConfigID = $shopConfig->ID;
+		
 		if (!$this->ID) $this->LastActive = SS_Datetime::now()->getValue();
 
 		//Set the base currency
