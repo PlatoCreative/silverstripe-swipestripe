@@ -22,10 +22,10 @@
 			<h1>$Title</h1>
 			<h3 class="product-price-js">
 				<% if Product.OnSpecial() %>
-					<span class="old-price">Was $Price.Nice</span><br />
-					<span class="special-price">Now $SpecialPrice.Nice</span>
+					<span class="old-price">Was $OriginalAmount.Nice()</span><br />
+					<span class="special-price">Now $Price.Nice()</span>
 				<% else %>
-					$Price.Nice
+					$Price.Nice()
 				<% end_if %>
 			</h3>
 			<div id="product-message" class="message"></div>

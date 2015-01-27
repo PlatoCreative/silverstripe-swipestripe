@@ -65,6 +65,41 @@ class Product extends Page implements HiddenClass {
 
 		return $amount;
 	}
+	
+	/**
+	 * Original price in base currency, can decorate to apply discounts etc.
+	 * 
+	 * @return Price
+	 */
+	public function OriginalAmount() {
+		// TODO: Multi currency
+		$shopConfig = ShopConfig::current_shop_config();
+
+		$amount = Price::create();
+		$price = $this->Price;
+		$amount->setAmount($price);
+		$amount->setCurrency($shopConfig->BaseCurrency);
+		$amount->setSymbol($shopConfig->BaseCurrencySymbol);
+
+		// Transform amount for applying discounts etc.
+		$this->extend('updateOriginalAmount', $amount);
+
+		return $amount;
+	}
+	
+	/**
+	 * Display original price, can decorate for multiple currency etc.
+	 * 
+	 * @return Price
+	 */
+	public function OriginalPrice() {
+		$amount = $this->OriginalAmount();
+
+		//Transform price here for display in different currencies etc.
+		$this->extend('updateOriginalPrice', $amount);
+
+		return $amount;
+	}
 
 	/**
 	 * Has many relations for Product.
