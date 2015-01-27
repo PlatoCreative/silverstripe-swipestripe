@@ -227,7 +227,24 @@ class ProductCategory_Controller extends Page_Controller {
 		$limit = self::$products_per_page;
 		$orderBy = self::$products_ordered_by;
 		
-		$products = $this->Products()->sort($orderBy);
+		$products = ArrayList::create($this->Products()->sort($orderBy)->toArray());
+		
+		// Go second level
+		$children = $this->Children()->filter(array('ClassName' => 'ProductCategory'));
+		foreach($children as $child){
+			$childProducts = $child->Products()->sort($orderBy)->toArray();
+			$products->merge($childProducts);
+			
+			// Go thrid level
+			$childChildren = $child->Children()->filter(array('ClassName' => 'ProductCategory'));
+			foreach($childChildren as $subChild){
+				$childProducts = $subChild->Products()->sort($orderBy)->toArray();
+				$products->merge($childProducts);
+			}
+		}
+		
+		$products->removeDuplicates('ID');
+				
 		$list = PaginatedList::create($products, $this->request)->setPageLength($limit);
 		
 		return $list;
