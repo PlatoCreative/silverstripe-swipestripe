@@ -16,6 +16,9 @@ Modifier:
 ShopAdmin:
   menu_icon: 'swipestripe/images/basket.png'
 
+CatalogAdmin:
+  menu_icon: 'swipestripe/images/catalog.png'
+
 Security:
   default_login_dest: 'account'
 

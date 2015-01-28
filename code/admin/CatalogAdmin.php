@@ -10,7 +10,7 @@ class CatalogAdmin extends ModelAdmin {
 
 	private static $url_segment = 'catalog';
 	private static $url_priority = 50;
-	private static $menu_title = 'Catalog';
+	private static $menu_title = 'Product Catalog';
 
 	public $showImportForm = false;
 
