@@ -33,10 +33,15 @@ class ShopConfig extends DataObject {
 		'NotificationBody' => 'HTMLText',
 		'NotificationTo' => 'Varchar'
 	);
+	
+	private static $has_one = array(
+		'SiteConfig' => 'SiteConfig'
+	);
 
 	private static $has_many = array(
 		//'Attributes' => 'Attribute_Default'
-		'Attributes' => 'Attribute'
+		'Attributes' => 'Attribute',
+		'Orders' => 'Order'
 	);
 
 	private static $defaults = array(
@@ -46,9 +51,17 @@ class ShopConfig extends DataObject {
 		'StockCheck' => false,
 		'StockManagement' => 'strict'
 	);
+	
+	public function onBeforeWrite(){
+		parent::onBeforeWrite();
+		$siteconfig = SiteConfig::current_site_config();
+		$this->SiteConfigID = $siteconfig->ID;			
+	}
 
 	public static function current_shop_config() {
-		$shopconfig = ShopConfig::get()->First();
+		//$shopconfig = ShopConfig::get()->First();
+		$siteconfig = SiteConfig::current_site_config();
+		$shopconfig = ShopConfig::get()->where("\"SiteConfigID\" = '$siteconfig->ID'")->First();
 		
 		//$this->extend('edit_current_shop_config', $shopconfig);
 		
@@ -71,7 +84,6 @@ class ShopConfig extends DataObject {
 	 * Setup a default ShopConfig record if none exists
 	 */
 	public function requireDefaultRecords() {
-
 		parent::requireDefaultRecords();
 
 		if(!self::current_shop_config()) {

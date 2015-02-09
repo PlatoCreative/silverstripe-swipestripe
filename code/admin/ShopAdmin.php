@@ -16,7 +16,7 @@ class ShopAdmin extends ModelAdmin {
 	public $showImportForm = false;
 
 	private static $managed_models = array(
-		'Order',
+		//'Order',
 		'Customer',
 		'ShopConfig'
 	);
@@ -143,7 +143,8 @@ class ShopAdmin extends ModelAdmin {
 				->addComponent($buttonAfter)
 				->addComponent($exportButton);
 
-		if ($this->modelClass == 'Order' || $this->modelClass == 'Customer') {
+		//if ($this->modelClass == 'Order' || $this->modelClass == 'Customer') {
+		if($this->modelClass == 'Customer') {
 			$fieldConfig->removeComponentsByType('GridFieldAddNewButton');
 		}
 

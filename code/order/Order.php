@@ -71,9 +71,7 @@ class Order extends DataObject implements PermissionProvider {
 	}
 
 	public function SubTotal() {
-
 		// TODO: Multi currency
-
 		$amount = Price::create();
 		$amount->setAmount($this->SubTotalPrice);
 		$amount->setCurrency($this->BaseCurrency);
