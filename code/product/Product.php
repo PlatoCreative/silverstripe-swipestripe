@@ -483,7 +483,6 @@ class Product_Controller extends Page_Controller {
 	);
 	
 	private static $url_handlers = array(
-		//'$Action/$ID/$OtherID' => '$Action'
 	);
 	
 	/**
@@ -623,5 +622,5 @@ class Product_Controller extends Page_Controller {
 				);	
 			}
 		}
-	}
+	}	
 }

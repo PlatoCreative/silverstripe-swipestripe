@@ -3,7 +3,6 @@ jQuery(document).ready(function($) {
 	$.entwine('sws', function($){
 
 		$('.cart-form .remove-item-js').entwine({
-
 			onmatch : function() {
 				var self = this;
 
@@ -21,7 +20,6 @@ jQuery(document).ready(function($) {
 			_removeItem: function(e) {
 				e.preventDefault();
 				var form = this.closest('form');
-
 				//Set quantity for this item to 0 and update the form
 				$('input[name="Quantity\\[' + this.data('item') + '\\]"]', form).val(0);
 				$('input[name="action_updateCart"]', form).click();

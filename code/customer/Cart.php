@@ -10,7 +10,8 @@
  */
 class Cart extends DataExtension {
 	private static $allowed_actions = array(
-		'RefreshCartOverview'
+		'RefreshCartOverview',
+		'TotalCartItems'
 	);
 	
 	/**
@@ -56,9 +57,20 @@ class Cart extends DataExtension {
 	}
 	
 	// Return the total cart count
-	public function TotalItems(){
+	public function TotalCartItems(){
+		$order = self::get_current_order();
 		$items = $order->Items();
-		return $items ? $items->Count() : 0;
+		$total = 0;
+		
+		foreach($items as $item){
+			$total += $item->Quantity;	
+		}
+		
+		if(Director::is_ajax()){
+			return Convert::array2json(array('Total' => $total));
+		} else {
+			return $total;
+		}
 	}
 	
 	/**
