@@ -139,8 +139,7 @@ jQuery(document).ready(function($) {
 			data : $(this).serialize(),
 			cache : false,
 			dataType : 'json',
-			success : function(data){
-				// Check if the product was added and display message to user
+			success : function(data){				// Check if the product was added and display message to user
 				if(jQuery().foundation){
 					$('#adding-to-cart').foundation('reveal', 'close');
 				}

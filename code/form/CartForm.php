@@ -142,16 +142,13 @@ class CartForm extends Form {
 		$quantities = (isset($data['Quantity'])) ?$data['Quantity'] : null;
 
 		if ($quantities) foreach ($quantities as $itemID => $quantity) {
-
 			if ($item = $currentOrder->Items()->find('ID', $itemID)) {
 				if ($quantity == 0) {
-
 					SS_Log::log(new Exception(print_r($item->toMap(), true)), SS_Log::NOTICE);
-
 					$item->delete();
-				}
-				else {
+				} else {
 					$item->Quantity = $quantity;
+					$item->Price = $item->CalculatePrice();
 					$item->write();
 				}
 			}

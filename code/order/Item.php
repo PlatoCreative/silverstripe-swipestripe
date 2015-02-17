@@ -19,7 +19,20 @@ class Item extends DataObject {
 	);
 	
 	private static $default_sort = 'LastEdited DESC';
+	
+	// Function for calculating the item price
+	public function CalculatePrice(){
+		$this->Price = $this->Product() ? $this->Product()->Amount()->getAmount() : 0;
+		
+		if($this->Variation()) {
+			$item->Price += $this->Variation()->Amount()->getAmount();
+		}		
+		
+		$this->extend('updateCalculatePrice');
 
+		return $this->Price;
+	}
+	
 	public function Amount() {
 		// TODO: Multi currency
 		$order = $this->Order();
@@ -157,7 +170,8 @@ class Item extends DataObject {
 	 * @return Mixed Product if it exists, otherwise null
 	 */
 	function Product(){
-		$product = Product::get()->byID($this->ProductID);//Versioned::get_version('Product', $this->ProductID, $this->ProductVersion);
+		// $product = Product::get()->byID($this->ProductID);
+		$product = ($this->ProductID) ? Versioned::get_version('Product', $this->ProductID, $this->ProductVersion) : null;
 		return $product;
 	}
 	

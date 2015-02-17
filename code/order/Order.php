@@ -530,6 +530,10 @@ class Order extends DataObject implements PermissionProvider {
 
 		if ($item && $item->exists()) {
 			$item->Quantity = $item->Quantity + $quantity;
+			
+			// Check for discounts and changes. Also allows for extension
+			$item->Price = $item->CalculatePrice();
+			
 			$item->write();
 		} else {
 			DB::getConn()->transactionStart();
@@ -538,24 +542,22 @@ class Order extends DataObject implements PermissionProvider {
 				$item = new Item();
 				$item->ProductID = $product->ID;
 				$item->ProductVersion = $product->Version;
-
-				//TODO: Think about percentage discounts and stuff like that, needs to apply to variation as well for total price to be correct
-				//TODO: Do not use Amount() here, need another accessor to support price discounts and changes though
-				$item->Price = $product->Amount()->getAmount();
+				//$item->Price = $product->Amount()->getAmount();
 				$item->Currency = $product->Amount()->getCurrency();
 
-				if ($variation && $variation->exists()) {
+				if($variation && $variation->exists()) {
 					$item->VariationID = $variation->ID;
 					$item->VariationVersion = $variation->Version;
-
-					//TODO: Do not use Amount() here, need another accessor to support price discounts and changes though
-					$item->Price += $variation->Amount()->getAmount();
+					//$item->Price += $variation->Amount()->getAmount();
 				}
-
+				
+				// Check for discounts and changes. Also allows for extension
+				$item->Price = $item->CalculatePrice();
+				
 				$item->Quantity = $quantity;
 				$item->OrderID = $this->ID;
 				$item->write();
-
+				
 				if ($options->exists()) foreach ($options as $option) {
 					$option->ItemID = $item->ID;
 					$option->write();
