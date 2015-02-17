@@ -20,7 +20,7 @@ CatalogAdmin:
   menu_icon: 'swipestripe/images/catalog.png'
 
 OrderAdmin:
-  menu_icon: 'swipestripe/images/catalog.png'
+  menu_icon: 'swipestripe/images/orders.png'
 
 Security:
   default_login_dest: 'account'
