@@ -15,9 +15,9 @@
 					<tr>
 						<th>&nbsp;</th>
 						<th><%t CartForm.PRODUCT 'Product' %></th>
-						<th><%t CartForm.PRICE 'Price' %> ($Cart.TotalPrice.Currency)</th>
+						<th><%t CartForm.PRICE 'Price' %> ($Cart.CartTotalPrice.Currency)</th>
 						<th><%t CartForm.QUANTITY 'Quantity' %></th>
-						<th><%t CartForm.TOTAL 'Total' %> ($Cart.TotalPrice.Currency)</th>
+						<th><%t CartForm.TOTAL 'Total' %> ($Cart.CartTotalPrice.Currency)</th>
 					</tr>
 				</thead>
 				<tbody>
