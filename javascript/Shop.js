@@ -172,18 +172,20 @@ jQuery(document).ready(function($) {
 				
 				var redirect = '/checkout';
 				
-				// Add the product to the cart
+				// Get the registration form
 				$.ajax({
 					type : "GET",
 					url : $(this).attr('action'),
 					data : $(this).serialize() + '&Redirect=' + redirect,
 					cache : false,
 					success : function(data){
-						$('#ordeform-wrapper').stop().animate({'opacity' : 0}, 500, function(){
-							$(this).html(data).stop().animate({'opacity' : 1}, 500);
+						$('#ordersignin-wrapper').stop().animate({'opacity' : 0}, 500, function(){
+							var returnForm = '<div class="small-12 columns"><div id="orderform-registration"><div class="orderform-box"><h2>Register A New Account</h2>' + data + '</div></div></div>';
+							$(this).html(returnForm).stop().animate({'opacity' : 1}, 500);
+							
 							$('body').on('submit', '#Form_RegisterAccountForm', function(e){
 								e.preventDefault();
-								$('#ordeform-wrapper').stop().animate({'opacity' : 0}, 500);
+								$('#ordersignin-wrapper #Form_RegisterAccountForm').stop().animate({'opacity' : 0}, 500);
 								$.ajax({
 									type : "POST",
 									url : $(this).attr('action'),
@@ -193,7 +195,8 @@ jQuery(document).ready(function($) {
 										if(data == redirect){
 											window.location = window.location.origin + redirect;
 										} else {
-											$('#ordeform-wrapper').html(data).stop().animate({'opacity' : 1}, 500);
+											$('#ordersignin-wrapper #Form_RegisterAccountForm').remove();
+											$('.orderform-box').append(data).stop().animate({'opacity' : 1}, 500);
 										}
 									}
 								});
