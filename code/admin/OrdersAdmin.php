@@ -94,7 +94,7 @@ class OrderAdmin extends ModelAdmin {
 		)));		
 		
 		$forms->push(new ArrayData(array (
-			'Title'     => 'Completed Orders',
+			'Title'     => 'Dispatched Orders',
 			'ClassName' => 'Order',
 			'Link' => $this->Link() . '?v=completed',//$this->Link($this->sanitiseClassName($class)),
 			'LinkOrCurrent' => ($request->getVar('v') && $request->getVar('v') == 'completed') ? 'current' : 'link'

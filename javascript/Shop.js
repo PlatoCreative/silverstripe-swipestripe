@@ -132,6 +132,9 @@ jQuery(document).ready(function($) {
 			$('#adding-to-cart').foundation('reveal', 'open');
 		}
 		
+		var addBtn = $('#ProductForm_ProductForm_action_ProductAdd');
+		addBtn.detach();
+		
 		// Add the product to the cart
 		$.ajax({
 			type : "POST",
@@ -147,14 +150,16 @@ jQuery(document).ready(function($) {
 				$('#product-message').html("<p>" + data.message + "</p>").css({'opacity' : 0}).removeClass('good bad').addClass(result).css({'opacity' : 1});
 				
 				// Refresh the cart overview
-				AjaxUpdateCartOverview();
-				
+				$.when(AjaxUpdateCartOverview()).done(function(){
+					addBtn.appendTo('.Actions');	
+				});
 			}
 		}).fail(function(){
 			if(jQuery().foundation){
 				$('#adding-to-cart').foundation('reveal', 'close');
 			}
 			$('#product-message').html("<p>Sorry there was an error adding this item to your cart. Please try again.</p>").css({'opacity' : 0}).removeClass('good bad').addClass('bad').css({'opacity' : 1});
+			addBtn.appendTo('Actions');
 		});
 	});
 	
