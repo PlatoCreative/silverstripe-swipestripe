@@ -538,7 +538,6 @@ class Order extends DataObject implements PermissionProvider {
 		} else {
 			DB::getConn()->transactionStart();
 			try {
-
 				$item = new Item();
 				$item->ProductID = $product->ID;
 				$item->ProductVersion = $product->Version;
@@ -551,10 +550,11 @@ class Order extends DataObject implements PermissionProvider {
 					//$item->Price += $variation->Amount()->getAmount();
 				}
 				
+				$item->Quantity = $quantity;
+				
 				// Check for discounts and changes. Also allows for extension
 				$item->Price = $item->CalculatePrice();
 				
-				$item->Quantity = $quantity;
 				$item->OrderID = $this->ID;
 				$item->write();
 				

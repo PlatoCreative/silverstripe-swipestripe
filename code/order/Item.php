@@ -25,7 +25,7 @@ class Item extends DataObject {
 		$this->Price = $this->Product() ? $this->Product()->Amount()->getAmount() : 0;
 		
 		if($this->Variation()) {
-			$item->Price += $this->Variation()->Amount()->getAmount();
+			$this->Price += $this->Variation()->Amount()->getAmount();
 		}		
 		
 		$this->extend('updateCalculatePrice');
