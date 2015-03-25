@@ -1,12 +1,12 @@
 
 jQuery.noConflict();
 jQuery(document).ready(function($) {
-	
+
 	/* CART OVERVIEW */
 	// Update cart function
 	function AjaxUpdateCartOverview(show){
 		show = show === undefined ? true : show;
-		
+
 		if(show){
 			$('#cart-overview').addClass('show');
 		}
@@ -20,7 +20,7 @@ jQuery(document).ready(function($) {
 					$('#cart-overview').removeClass('show');
 				}, 3000);
 			}
-			
+
 			// Update count number
 			if($('#cart-total-overview').length > 0){
 				//var cartTotalUrl = window.location.hostname + window.location.pathname + '/TotalCartItems';
@@ -35,14 +35,14 @@ jQuery(document).ready(function($) {
 			}
 		});
 	}
-	
+
 	$('#cart-overview').entwine({
-		onmatch : function(){			
+		onmatch : function(){
 			// Remove items from the cart
 			$('body').on('click', 'a.cart-overview-remove', function(e){
 				e.preventDefault();
 				var removeItem = $(this).attr('data-item');
-				
+
 				$.ajax({
 					type : "POST",
 					url : $(this).attr('href') + '/' + removeItem,
@@ -56,24 +56,24 @@ jQuery(document).ready(function($) {
 			});
 		}
 	});
-	
+
 	/* CART PAGE */
 	$('#CartForm_CartForm').entwine({
 		onmatch : function(){
 			// Refresh the cart table
 			function AjaxRefreshCartPage(){
 				$('#CartForm-Holder, #cart-summary-loader').addClass('loading');
-				$('#CartForm-Holder').load(window.location.href + ' #CartForm_CartForm', function(){
+				$('#CartForm-Holder').load(window.location.href + ' #CartForm-Holder', function(){
 					$('#CartForm-Holder, #cart-summary-loader').removeClass('loading');
 				});
 			}
-			
+
 			// Remove from cart function
 			$('.cart-summary-remove').attr('href', window.location.href + '/RemoveItem');
 			$('body').on('click', 'a.cart-summary-remove', function(e){
 				e.preventDefault();
 				var removeItem = $(this).attr('data-item');
-				
+
 				$.ajax({
 					type : "POST",
 					url : $(this).attr('href') + '/' + removeItem,
@@ -82,7 +82,7 @@ jQuery(document).ready(function($) {
 					success : function(data){
 						// Refresh the main cart
 						AjaxRefreshCartPage();
-						
+
 						// Refresh the cart overview
 						AjaxUpdateCartOverview(false);
 					}
@@ -90,8 +90,8 @@ jQuery(document).ready(function($) {
 			});
 		}
 	});
-	
-	/* PRODUCT PAGE */		
+
+	/* PRODUCT PAGE */
 	$('.product-form').entwine({
 		onmatch : function() {
 			var self = this;
@@ -104,7 +104,7 @@ jQuery(document).ready(function($) {
 		},
 		onunmatch: function() {
 			this._super();
-		},		
+		},
 		_updatePrice: function(e) {
 			var self = this,
 				form = this.closest('form');
@@ -127,14 +127,14 @@ jQuery(document).ready(function($) {
 		}
 	}).submit(function(e){
 		e.preventDefault();
-		
+
 		if(jQuery().foundation){
 			$('#adding-to-cart').foundation('reveal', 'open');
 		}
-		
+
 		var addBtn = $('#ProductForm_ProductForm_action_ProductAdd');
 		addBtn.detach();
-		
+
 		// Add the product to the cart
 		$.ajax({
 			type : "POST",
@@ -148,10 +148,10 @@ jQuery(document).ready(function($) {
 				}
 				var result = data.result ? 'good' : 'bad';
 				$('#product-message').html("<p>" + data.message + "</p>").css({'opacity' : 0}).removeClass('good bad').addClass(result).css({'opacity' : 1});
-				
+
 				// Refresh the cart overview
 				$.when(AjaxUpdateCartOverview()).done(function(){
-					addBtn.appendTo('.Actions');	
+					addBtn.appendTo('.Actions');
 				});
 			}
 		}).fail(function(){
@@ -162,16 +162,16 @@ jQuery(document).ready(function($) {
 			addBtn.appendTo('Actions');
 		});
 	});
-	
+
 	/* CHECKOUT PAGE */
 	$('.CheckoutPage').entwine({
 		onmatch : function(){
 			// Post small register form
 			$('#Form_SmallRegisterAccountForm').submit(function(e){
 				e.preventDefault();
-				
+
 				var redirect = '/checkout';
-				
+
 				// Get the registration form
 				$.ajax({
 					type : "GET",
@@ -182,7 +182,7 @@ jQuery(document).ready(function($) {
 						$('#ordersignin-wrapper').stop().animate({'opacity' : 0}, 500, function(){
 							var returnForm = '<div class="small-12 columns"><div id="orderform-registration"><div class="orderform-box"><h2>Register A New Account</h2>' + data + '</div></div></div>';
 							$(this).html(returnForm).stop().animate({'opacity' : 1}, 500);
-							
+
 							$('body').on('submit', '#Form_RegisterAccountForm', function(e){
 								e.preventDefault();
 								$('#ordersignin-wrapper #Form_RegisterAccountForm').stop().animate({'opacity' : 0}, 500);
