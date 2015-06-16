@@ -9,14 +9,14 @@
 class Product extends Page implements HiddenClass {
 	/**
 	 * Flag for denoting if this is the first time this Product is being written.
-	 * 
+	 *
 	 * @var Boolean
 	 */
 	protected $firstWrite = false;
 
 	/**
 	 * DB fields for Product.
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $db = array(
@@ -24,16 +24,17 @@ class Product extends Page implements HiddenClass {
 		'SpecialPrice' => 'Decimal(19,8)',
 		'Currency' => 'Varchar(3)',
 		'ShortDescription' => 'HTMLText',
-		'Stock' => 'Int'
+		'Stock' => 'Int',
+		'SKU' => 'Varchar(250)'
 	);
-	
+
 	public function OnSpecial(){
 		return ($this->SpecialPrice > 0) ? true : false;
 	}
-	
+
 	/**
 	 * Actual price in base currency, can decorate to apply discounts etc.
-	 * 
+	 *
 	 * @return Price
 	 */
 	public function Amount() {
@@ -54,7 +55,7 @@ class Product extends Page implements HiddenClass {
 
 	/**
 	 * Display price, can decorate for multiple currency etc.
-	 * 
+	 *
 	 * @return Price
 	 */
 	public function Price() {
@@ -65,10 +66,10 @@ class Product extends Page implements HiddenClass {
 
 		return $amount;
 	}
-	
+
 	/**
 	 * Original price in base currency, can decorate to apply discounts etc.
-	 * 
+	 *
 	 * @return Price
 	 */
 	public function OriginalAmount() {
@@ -86,10 +87,10 @@ class Product extends Page implements HiddenClass {
 
 		return $amount;
 	}
-	
+
 	/**
 	 * Display original price, can decorate for multiple currency etc.
-	 * 
+	 *
 	 * @return Price
 	 */
 	public function OriginalPrice() {
@@ -103,7 +104,7 @@ class Product extends Page implements HiddenClass {
 
 	/**
 	 * Has many relations for Product.
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $has_many = array(
@@ -112,32 +113,32 @@ class Product extends Page implements HiddenClass {
 		'Variations' => 'Variation',
 		'Images' => 'ProductImage'
 	);
-	
+
 	private static $has_one = array(
 		'MainCategory' => 'ProductCategory'
 	);
-	
+
 	/**
 	 * Belongs many many relations for Product
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $belongs_many_many = array(
 		'ProductCategories' => 'ProductCategory'
 	);
-	
+
 	/**
 	 * Defaults for Product
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $defaults = array(
 		'ParentID' => -1
 	);
-	
+
 	/**
 	 * Summary fields for displaying Products in the CMS
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $summary_fields = array(
@@ -157,45 +158,45 @@ class Product extends Page implements HiddenClass {
 			'title' => 'Category'
 		)
 	);
-	
+
 	private static $casting = array(
 		//'ProductCategory' => 'Varchar',
 	);
 
-	/** 
+	/**
 	 * @see SiteTree::onBeforeWrite()
 	 */
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
 	}
-	
-	/** 
+
+	/**
 	 * @see SiteTree::onAfterWrite()
 	 */
 	public function onAfterWrite() {
-		parent::onAfterWrite();		
+		parent::onAfterWrite();
 	}
-	
-	/** 
+
+	/**
 	 * @see SiteTree::onBeforePublish()
 	 */
 	public function onBeforePublish(){
 		// Fixes the can't find stage issue
 		if($this->stagesDiffer('Stage', 'Live')){
-			$this->writeToStage('Stage');		
+			$this->writeToStage('Stage');
 		}
 	}
-	
-	/** 
+
+	/**
 	* @see SiteTree::onAfterPublish()
 	*/
-	public function onAfterPublish(){		
+	public function onAfterPublish(){
 		$this->ParentID = -1;
-		
+
 		//Save in base currency
 		$shopConfig = ShopConfig::current_shop_config();
 		$this->Currency = $shopConfig->BaseCurrency;
-		
+
 		// Check for main category ID and the categories list
 		$productCategories = $this->ProductCategories();
 		$maincat = ProductCategory::get()->where("SiteTree.ID =" . $this->MainCategoryID)->first();
@@ -203,15 +204,15 @@ class Product extends Page implements HiddenClass {
 			$productCategories->add($maincat);
 		}
 	}
-	
+
 	/**
 	 * Delete images and clear categories link
-	 * 
+	 *
 	 * @see SiteTree::onBeforeDelete()
 	 */
 	public function onBeforeDelete(){
 		parent::onBeforeDelete();
-		
+
 		if($this->Images() && $images = $this->Images()){
 			foreach($images as $image){
 				if($image->exists()){
@@ -220,20 +221,20 @@ class Product extends Page implements HiddenClass {
 			}
 		}
 	}
-	
+
 	/**
 	 * Unpublish products if they get deleted, such as in product admin area
-	 * 
+	 *
 	 * @see SiteTree::onAfterDelete()
 	 */
 	public function onAfterDelete() {
 		parent::onAfterDelete();
-		
+
 		if($this->isPublished()) {
 			$this->doUnpublish();
 		}
 	}
-	
+
 	public function canView($member = null){
 		return true;
 		// TODO FIX THIS
@@ -243,29 +244,30 @@ class Product extends Page implements HiddenClass {
 		}
 		return Permission::check('ADMIN', 'any', $member);
 	}
-	
+
 	public function canAddChildren($member = null){
-		return false;	
+		return false;
 	}
-		
+
 	/**
 	 * Set some CMS fields for managing Products
-	 * 
+	 *
 	 * @see Page::getCMSFields()
 	 * @return FieldList
 	 */
 	public function getCMSFields() {
 		$shopConfig = ShopConfig::current_shop_config();
 		$fields = parent::getCMSFields();
-		
-		$categories = ProductCategory::getAllCategories();		
+
+		$categories = ProductCategory::getAllCategories();
 		if($categories){
 			// Product fields
 			$fields->addFieldsToTab('Root.Main', array(
+				TextField::create('SKU', 'SKU Code'),
 				PriceField::create('Price', 'Standard Price'),
 				PriceField::create('SpecialPrice', 'Special Price')->setRightTitle('If price set to 0.00 the product will not be on special')
 			), 'Content');
-	
+
 			// Replace URL Segment field
 			/*
 			$urlsegment = SiteTreeURLSegmentField::create("URLSegment", 'URLSegment');
@@ -274,7 +276,7 @@ class Product extends Page implements HiddenClass {
 			$urlsegment->setURLPrefix($url);
 			$fields->replaceField('URLSegment', $urlsegment);
 			*/
-			
+
 			// Categories Fields
 			arsort($categories);
 			$fields->addFieldsToTab(
@@ -285,17 +287,17 @@ class Product extends Page implements HiddenClass {
 				),
 				'Content'
 			);
-			
+
 			// Short Description
 			$fields->addFieldToTab('Root.Main', TextareaField::create('ShortDescription', 'Short Description'), 'Content');
-			
+
 			// Product images
-			$prodimgconf = GridFieldConfig_RelationEditor::create(10)->addComponent(new GridFieldSortableRows('SortOrder'));		
+			$prodimgconf = GridFieldConfig_RelationEditor::create(10)->addComponent(new GridFieldSortableRows('SortOrder'));
 			$fields->addFieldToTab('Root.Images', new GridField('Images', 'Images', $this->Images(), $prodimgconf));
-				
+
 			//Product variations
 			$attributes = $shopConfig->Attributes();//$this->Attributes();
-			if ($attributes && $attributes->exists()) {				
+			if ($attributes && $attributes->exists()) {
 				$variationFieldList = array();
 				foreach ($attributes as $attribute) {
 					$variationFieldList['AttributeValue_'.$attribute->ID] = $attribute->Title;
@@ -314,46 +316,46 @@ class Product extends Page implements HiddenClass {
 				);
 				$fields->addFieldToTab('Root.Variations', $listField);
 			}
-			
+
 			// Stock level
 			if($shopConfig->StockCheck){
 				if(!$this->Variations()){
-					$fields->addFieldToTab('Root.Main', TextField::create('Stock', 'Stock level'), 'MainCategoryID');	
+					$fields->addFieldToTab('Root.Main', TextField::create('Stock', 'Stock level'), 'MainCategoryID');
 				}
 			}
-   
+
 		} else {
-			$fields->addFieldToTab('Root.Main', new LiteralField('CategoryWarning', 
+			$fields->addFieldToTab('Root.Main', new LiteralField('CategoryWarning',
 				'<p class="message warning">Please create a category before creating products.</p>'
-			), 'Title');	
+			), 'Title');
 		}
 
 		//Ability to edit fields added to CMS here
 		$this->extend('updateProductCMSFields', $fields);
 
 		if ($warning = ShopConfig::base_currency_warning()) {
-			$fields->addFieldToTab('Root.Main', new LiteralField('BaseCurrencyWarning', 
+			$fields->addFieldToTab('Root.Main', new LiteralField('BaseCurrencyWarning',
 				'<p class="message warning">'.$warning.'</p>'
 			), 'Title');
 		}
-		
+
 		return $fields;
 	}
-	
-	public function getCMSValidator() { 
+
+	public function getCMSValidator() {
 		return new RequiredFields(array(
 			'Title',
 			'URLSegment',
 			'MenuTitle',
 			'MainCategoryID',
 			'Price'
-		)); 
+		));
 	}
-	
+
 	/**
-	 * Get the URL for this Product, products that are not part of the SiteTree are 
+	 * Get the URL for this Product, products that are not part of the SiteTree are
 	 * displayed by the {@link Product_Controller}.
-	 * 
+	 *
 	 * @see SiteTree::Link()
 	 * @see Product_Controller::show()
 	 * @return String
@@ -362,40 +364,40 @@ class Product extends Page implements HiddenClass {
 		if ($this->ParentID > -1) {
 			return parent::Link($action);
 		}
-		
+
 		if(Controller::curr() == 'ProductCategory_Controller'){ // Return the current category
 			$category = Controller::curr();
 			return Controller::join_links($category->Link() . 'product/', $this->URLSegment);//$this->ID);
-			
+
 		} else if($this->MainCategory()){ // Return the main category
 			return Controller::join_links($this->MainCategory()->Link() . 'product/', $this->URLSegment);//$this->ID);
-			
+
 		} else { // Return base url
 			return Controller::join_links(Director::baseURL() . 'product/', $this->RelativeLink($action));
 		}
 	}
-	
+
 	/**
 	 * A product is required to be added to a cart with a variation if it has attributes.
 	 * A product with attributes needs to have some enabled {@link Variation}s
-	 * 
+	 *
 	 * @return Boolean
 	 */
 	public function requiresVariation() {
-		$variations = $this->Variations();		
+		$variations = $this->Variations();
 		return $variations && $variations->exists();
 		/*
 		$attributes = $this->Attributes();
-		
+
 		$this->extend('updaterequiresVariation', $attributes);
-		
+
 		return $attributes && $attributes->exists();
 		*/
 	}
-	
+
 	/**
 	 * Get options for an Attribute of this Product.
-	 * 
+	 *
 	 * @param Int $attributeID
 	 * @return ArrayList
 	 */
@@ -414,23 +416,23 @@ class Product extends Page implements HiddenClass {
 		$options = $options->sort('SortOrder');
 		return $options;
 	}
-	
+
 	/**
 	 * Validate the Product before it is saved in {@link ShopAdmin}.
-	 * 
+	 *
 	 * @see DataObject::validate()
 	 * @return ValidationResult
 	 */
 	public function validate(){
-		$result = new ValidationResult(); 
+		$result = new ValidationResult();
 
 		//If this is being published, check that enabled variations exist if they are required
 		$request = Controller::curr()->getRequest();
 		$publishing = ($request && $request->getVar('action_publish')) ? true : false;
-		
+
 		if($publishing && $this->requiresVariation()){
 			$variations = $this->Variations();
-			
+
 			if(!in_array('Enabled', $variations->map('ID', 'Status')->toArray())){
 				$result->error(
 					'Cannot publish product when no variations are enabled. Please enable some product variations and try again.',
@@ -440,7 +442,7 @@ class Product extends Page implements HiddenClass {
 		}
 		return $result;
 	}
-	
+
 	// Check stock level
 	// TODO Improve for live cart checking
 	public function CheckStock($varID = null){
@@ -461,19 +463,19 @@ class Product extends Page implements HiddenClass {
 }
 
 /**
- * Displays a product, add to cart form, gets options and variation price for a {@link Product} 
+ * Displays a product, add to cart form, gets options and variation price for a {@link Product}
  * via AJAX.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
  * @subpackage product
  */
 class Product_Controller extends Page_Controller {
-	
+
 	/**
 	 * Allowed actions for this controller
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $allowed_actions = array(
@@ -481,29 +483,29 @@ class Product_Controller extends Page_Controller {
 		'productform',
 		'ProductAdd'
 	);
-	
+
 	private static $url_handlers = array(
 	);
-	
+
 	/**
 	 * Include some CSS and set the dataRecord to the current Product that is being viewed.
-	 * 
+	 *
 	 * @see Page_Controller::init()
 	 */
 	public function init(){
 		parent::init();
-		
+
 		// CSS & JS
 		Requirements::javascript('swipestripe/javascript/Attribute_OptionField.js');
 		$params = $this->getURLParams();
-		
-		if($params['ID'] != '') {	
+
+		if($params['ID'] != '') {
 			$product = $this->getProductFromUrl();
-			if($product && $product->exists()){				
-				$this->dataRecord = $product; 
+			if($product && $product->exists()){
+				$this->dataRecord = $product;
 				$this->failover = $this->dataRecord;
 				$request = $this->request;
-				
+
 				// Handle Actions - TODO: work out why this doesn't work normally
 				if(isset($params['Action']) && $params['Action'] != ''){
 					$val = $this->handleAction($request, $params['Action']);
@@ -517,24 +519,24 @@ class Product_Controller extends Page_Controller {
 		} else {
 			return $this->httpError(404);
 		}
-		
+
 		$this->extend('onInit');
 	}
-	
+
 	public function Product(){
 		return $this->getProductFromUrl();
 	}
-	
+
 	public function getProductFromUrl($urlVar = null){
 		if(!$urlVar){
 			$params = $this->getURLParams();
-			if($params['ID'] != '') {	
-				$urlVar = $params['ID'];	
+			if($params['ID'] != '') {
+				$urlVar = $params['ID'];
 			} else {
-				return false;	
+				return false;
 			}
 		}
-		$product = Product::get()->filter(array('URLSegment' => Convert::raw2sql($urlVar)))->first();	
+		$product = Product::get()->filter(array('URLSegment' => Convert::raw2sql($urlVar)))->first();
 		if(!$product){
 			$product = Product::get()->byID(Convert::raw2sql($urlVar));
 		}
@@ -548,15 +550,15 @@ class Product_Controller extends Page_Controller {
 			$quantity,
 			$redirectURL
 		)->disableSecurityToken();
-		
+
 		Session::set('ProductForm', $form);
-		
+
 		return $form;
 	}
-	
+
 	/**
 	 * Add an item to the current cart ({@link Order}) for a given {@link Product}.
-	 * 
+	 *
 	 * @param $request
 	 *
 	 */
@@ -569,19 +571,19 @@ class Product_Controller extends Page_Controller {
 			$form->loadDataFrom($data);
 
 			$added = $cart->addItem(
-				$form->getProduct(), 
-				$form->getVariation(), 
-				$form->getQuantity(), 
+				$form->getProduct(),
+				$form->getVariation(),
+				$form->getQuantity(),
 				$form->getOptions()
 			);
-			
+
 			Session::clear('ProductForm');
-			
+
 			if(Director::is_ajax()){
 				return Convert::array2json(array(
 					'result' => $added->exists(),
 					'message' => $added ? 'Successfully added to your cart.' : 'There was an error updating your cart. Please try again.'
-				));	
+				));
 			} else {
 				//Show feedback if redirecting back to the Product page
 				if (!$this->getRequest()->requestVar('Redirect')) {
@@ -589,7 +591,7 @@ class Product_Controller extends Page_Controller {
 					$message = _t('ProductForm.PRODUCT_ADDED', 'The product was added to your cart.');
 					if ($cartPage->exists()) {
 						$message = _t(
-							'ProductForm.PRODUCT_ADDED_LINK', 
+							'ProductForm.PRODUCT_ADDED_LINK',
 							'The product was added to {openanchor}your cart{closeanchor}.',
 							array(
 								'openanchor' => "<a href=\"{$cartPage->Link()}\">",
@@ -603,10 +605,10 @@ class Product_Controller extends Page_Controller {
 						false
 					);
 				}
-			
+
 				$form->goToNextPage();
 			}
-			
+
 		} else {
 			if(Director::is_ajax()){
 				return Convert::array2json(array(
@@ -619,8 +621,8 @@ class Product_Controller extends Page_Controller {
 					DBField::create_field("HTMLText", $message),
 					'bad',
 					false
-				);	
+				);
 			}
 		}
-	}	
+	}
 }
