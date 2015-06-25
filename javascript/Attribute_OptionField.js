@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
 									if (variationOptions.filter(function(elem) {
 										return partial.indexOf(elem) > -1;
 									}).length == partial.length) {
-									
+
 										//check if the option getting added does not already exist in the dropdown (to avoid duplicate options)
 										if ($('option[value='+val+']',self).length == 0) {
 											$("<option/>").attr("value", val).html(text).appendTo(self);
