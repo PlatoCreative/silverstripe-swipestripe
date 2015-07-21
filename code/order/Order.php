@@ -197,7 +197,8 @@ class Order extends DataObject implements PermissionProvider {
 
 		if ($member == null && !$member = Member::currentUser()) return false;
 
-		$administratorPerm = Permission::check('ADMIN') && Permission::check('VIEW_ORDER', 'any', $member);
+		$contentgroup = Group::get()->filter(array('code' => 'content-authors'))->first();
+		$administratorPerm = (Permission::check('ADMIN') || $member->inGroup($contentgroup->ID)) && Permission::check('VIEW_ORDER', 'any', $member);
 		$customerPerm = Permission::check('VIEW_ORDER', 'any', $member) && $member->ID == $this->MemberID;
 
 		return $administratorPerm || $customerPerm;
@@ -210,7 +211,10 @@ class Order extends DataObject implements PermissionProvider {
 	 * @return Boolean False always
 	 */
 	public function canEdit($member = null) {
-		$administratorPerm = Permission::check('ADMIN') && Permission::check('EDIT_ORDER', 'any', $member);
+		if ($member == null && !$member = Member::currentUser()) return false;
+		
+		$contentgroup = Group::get()->filter(array('code' => 'content-authors'))->first();
+		$administratorPerm = (Permission::check('ADMIN') || $member->inGroup($contentgroup->ID)) && Permission::check('EDIT_ORDER', 'any', $member);
 
 		return $administratorPerm;
 	}
