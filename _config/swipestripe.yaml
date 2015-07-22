@@ -12,6 +12,8 @@ Director:
 Modifier:
   Enabled:
     -
+ShopConfig:
+  HideVariationsOnSpecial: false
 
 ShopAdmin:
   menu_icon: 'swipestripe/images/basket.png'
@@ -26,21 +28,21 @@ Security:
   default_login_dest: 'account'
 
 Payment:
-  extensions: 
+  extensions:
     - 'Payment_Extension'
 
 PaymentProcessor:
-  extensions: 
+  extensions:
     - 'Payment_ProcessorExtension'
 
 LeftAndMain:
-  extensions: 
+  extensions:
     - 'ShopAdmin_LeftAndMainExtension'
 
 Page_Controller:
-  extensions: 
+  extensions:
     - 'Cart'
 
 Security:
-  extensions: 
+  extensions:
     - 'Cart'

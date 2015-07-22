@@ -32,6 +32,17 @@ class Product extends Page implements HiddenClass {
 		return ($this->SpecialPrice > 0) ? true : false;
 	}
 
+	public function Variations(){
+		$shopConfig = ShopConfig::current_shop_config();
+
+		if($shopConfig->config()->HideVariationsOnSpecial){
+			$variations = $this->owner->OnSpecial() ? new ArrayList() : Variation::get()->filter(array('ProductID' => $this->ID));
+		} else {
+			$variations = Variation::get()->filter(array('ProductID' => $this->ID));
+		}
+		return $variations;
+	}
+
 	/**
 	 * Actual price in base currency, can decorate to apply discounts etc.
 	 *

@@ -1,7 +1,7 @@
 <?php
 /**
  * Shop configuration object for containing all the shop settings.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -21,7 +21,7 @@ class ShopConfig extends DataObject {
 
 		'CartTimeout' => 'Int',
 		'CartTimeoutUnit' => "Enum('minute, hour, day', 'hour')",
-		
+
 		'StockCheck' => 'Boolean',
 		'StockManagement' => "Enum('strict, relaxed', 'strict')",
 
@@ -33,7 +33,7 @@ class ShopConfig extends DataObject {
 		'NotificationBody' => 'HTMLText',
 		'NotificationTo' => 'Varchar'
 	);
-	
+
 	private static $has_one = array(
 		'SiteConfig' => 'SiteConfig'
 	);
@@ -51,20 +51,20 @@ class ShopConfig extends DataObject {
 		'StockCheck' => false,
 		'StockManagement' => 'strict'
 	);
-	
+
 	public function onBeforeWrite(){
 		parent::onBeforeWrite();
 		$siteconfig = SiteConfig::current_site_config();
-		$this->SiteConfigID = $siteconfig->ID;			
+		$this->SiteConfigID = $siteconfig->ID;
 	}
 
 	public static function current_shop_config() {
 		//$shopconfig = ShopConfig::get()->First();
 		$siteconfig = SiteConfig::current_site_config();
 		$shopconfig = ShopConfig::get()->where("\"SiteConfigID\" = '$siteconfig->ID'")->First();
-		
+
 		//$this->extend('edit_current_shop_config', $shopconfig);
-		
+
 		return $shopconfig;
 	}
 
