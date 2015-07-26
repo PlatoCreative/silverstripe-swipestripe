@@ -36,7 +36,7 @@ class Product extends Page implements HiddenClass {
 		$shopConfig = ShopConfig::current_shop_config();
 
 		if($shopConfig->config()->HideVariationsOnSpecial){
-			$variations = $this->owner->OnSpecial() ? false : Variation::get()->filter(array('ProductID' => $this->ID));
+			$variations = $this->OnSpecial() ? false : Variation::get()->filter(array('ProductID' => $this->ID));
 		} else {
 			$variations = Variation::get()->filter(array('ProductID' => $this->ID));
 		}
@@ -319,7 +319,7 @@ class Product extends Page implements HiddenClass {
 				$dataColumns = $config->getComponentByType('GridFieldDataColumns');
 				$dataColumns->setDisplayFields($variationFieldList);
 
-				if($this->OnSpecial()){
+				if($this->OnSpecial() && $shopConfig->config()->HideVariationsOnSpecial){
 					$listField = new LiteralField('','<h3>Variations can only be added when a product is not on special.</h3>');
 				} else {
 					$listField = new GridField(

@@ -2,9 +2,9 @@
 /**
  * Represents an Option for an Attribute, e.g: Small, Medium, Large, Red etc.
  * Default Options can be created for Attributes, they are pre populated and duplicated into the Product
- * when the Attribute is added to a Product. Options can be changed for each Product. 
+ * when the Attribute is added to a Product. Options can be changed for each Product.
  * Default Options will have a ProductID of 0.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -17,7 +17,7 @@ class Option extends DataObject implements PermissionProvider {
 
 	/**
 	 * DB fields for this Option
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $db = array(
@@ -28,24 +28,24 @@ class Option extends DataObject implements PermissionProvider {
 
 	/**
 	 * Has one relations for an Option
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $has_one = array(
 		'Attribute' => 'Attribute',
 		//'Product' => 'Product'
 	);
-	
+
 	/**
 	 * Belongs many many relations for an Option
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $belongs_many_many = array(
 		'Variations' => 'Variation'
 	);
 
-	private static $default_sort = 'SortOrder';
+	private static $default_sort = 'SortOrder ASC';
 
 	public function providePermissions() {
 		return array(
@@ -71,15 +71,15 @@ class Option extends DataObject implements PermissionProvider {
 
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
-		
+
 		$fields->removeByName('Variations');
 		//$fields->removeByName('ProductID');
 		$fields->removeByName('AttributeID');
 		$fields->removeByName('SortOrder');
-		
+
 		return $fields;
 	}
-	
+
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
 		//$this->ProductID = 0;

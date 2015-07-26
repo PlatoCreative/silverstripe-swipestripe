@@ -1,12 +1,12 @@
 <?php
 /**
  * Represents a {@link Product} Attribute, e.g: Size, Color, Material etc.
- * Attributes are created in the {@link ShopAdmin} where they can be set with default 
+ * Attributes are created in the {@link ShopAdmin} where they can be set with default
  * Options. They are then selected on each product they relate to. Once an attribute
- * is added to a Product, that Product needs to define some Options for that Attribute 
+ * is added to a Product, that Product needs to define some Options for that Attribute
  * and also have some Variations. If the Product does not have Variations when it needs to
  * then it cannot be purchased.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -16,12 +16,12 @@ class Attribute extends DataObject implements PermissionProvider {
 
 	private static $singular_name = 'Attribute';
 	private static $plural_name = 'Attributes';
-	
+
 	public $firstWrite = false;
 
 	/**
 	 * DB fields for the Attribute
-	 * 
+	 *
 	 * @see Product_Controller::AddToCartForm()
 	 * @var Array
 	 */
@@ -30,10 +30,10 @@ class Attribute extends DataObject implements PermissionProvider {
 		'Description' => 'Text',
 		'SortOrder' => 'Int'
 	);
-	
+
 	/**
 	 * Has many relations for the Attribute
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $has_many = array(
@@ -45,19 +45,19 @@ class Attribute extends DataObject implements PermissionProvider {
 		//'DefaultAttribute' => 'Attribute_Default'
 		'ShopConfig' => 'ShopConfig'
 	);
-	
+
 	/**
 	 * Searchable fields for Attributes
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $searchable_fields = array(
 		'Title'
 	);
-	
+
 	/**
 	 * Summary fields for Attributes
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $summary_fields = array(
@@ -92,7 +92,7 @@ class Attribute extends DataObject implements PermissionProvider {
 
 	/**
 	 * Add some fields to the CMS for managing Attributes.
-	 * 
+	 *
 	 * @see DataObject::getCMSFields()
 	 * @return FieldList
 	 */
@@ -106,16 +106,16 @@ class Attribute extends DataObject implements PermissionProvider {
 				)
 			)
 		);
-		
+
 		/*
 		if (!$this->ID) {
 			$defaultAttributes = Attribute_Default::get();
 			if ($defaultAttributes && $defaultAttributes->exists()) {
 
 				$fields->addFieldToTab(
-					'Root.Attribute', 
+					'Root.Attribute',
 					DropdownField::create(
-						'DefaultAttributeID', 
+						'DefaultAttributeID',
 						'Use existing attribute',
 						$defaultAttributes->map('ID', 'TitleOptionSummary')->toArray()
 					)->setHasEmptyDefault(true),
@@ -125,18 +125,19 @@ class Attribute extends DataObject implements PermissionProvider {
 			}
 		}
 		*/
-		
+
 		if ($this->ID) {
+			//$optionConf = GridFieldConfig_RelationEditor::create(10)->addComponent(new GridFieldSortableRows('SortOrder'));
 			$fields->addFieldToTab('Root.Options', GridField::create(
 				'Options',
 				'Options',
 				$this->Options(),
-				GridFieldConfig_BasicSortable::create()
+				GridFieldConfig_RelationEditor::create(10)->addComponent(new GridFieldSortableRows('SortOrder'))
 			));
 		}
 
 		$this->extend('updateCMSFields', $fields);
-		
+
 		return $fields;
 	}
 
@@ -160,10 +161,10 @@ class Attribute extends DataObject implements PermissionProvider {
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		
+
 		$shopConfig = ShopConfig::current_shop_config();
 		$this->ShopConfigID = $shopConfig->ID;
-		
+
 		$this->firstWrite = !$this->isInDB();
 		if ($this->firstWrite) {
 			/*
@@ -232,7 +233,7 @@ class Attribute_OptionField extends DropdownField {
 		$title = $attr->Title;
 		$source = $product->getOptionsForAttribute($attr->ID)->map();
 		$value = null;
-		
+
 		$this->addExtraClass('dropdown');
 
 		//If previous attribute field exists, listen to it and react with new options
@@ -244,7 +245,6 @@ class Attribute_OptionField extends DropdownField {
 			$options = array();
 			$temp = array();
 			if ($variations && $variations->exists()) foreach ($variations as $variation) {
-
 				$prevOption = $variation->getOptionForAttribute($prev->ID);
 				$option = $variation->getOptionForAttribute($attr->ID);
 
@@ -307,7 +307,7 @@ class Attribute_Default extends Attribute {
 				GridFieldConfig_Basic::create()
 			));
 		}
-		
+
 		$this->extend('updateCMSFields', $fields);
 
 		return $fields;
