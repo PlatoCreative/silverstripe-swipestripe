@@ -18,7 +18,11 @@ jQuery(document).ready(function($) {
 			if(show){
 				window.setTimeout(function(){
 					$('#cart-overview').removeClass('show');
-				}, 3000);
+					// Redirect user to the cart overview page
+					if($('#cart-summary-btn').length > 0 && $('#cart-summary-btn').hasClass('auto-redirect')){
+						window.location.replace($('#cart-summary-btn').attr('href'));
+					}
+				}, 2000);
 			}
 
 			// Update count number
