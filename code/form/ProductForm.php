@@ -39,7 +39,8 @@ class ProductForm extends Form {
 					$variationPrice = $variation->Price();
 
 					$amount = Price::create();
-					$amount->setAmount($productPrice->getAmount() + $variationPrice->getAmount());
+					//$amount->setAmount($productPrice->getAmount() + $variationPrice->getAmount());
+					$amount->setAmount($variationPrice->getAmount());
 					$amount->setCurrency($productPrice->getCurrency());
 					$amount->setSymbol($productPrice->getSymbol());
 
