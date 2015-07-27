@@ -150,7 +150,7 @@ class Customer extends Member {
 				$body .= "Email: " . $this->Email . "<br />";
 				$body .= "Account Number: " . $this->AccountNumber . "</p>";
 				$body .= "<p>Activate the user by clicking the following link.<br />";
-				$body .= "<a href='" . Director::BaseURL() . "admin/shop/Customer/EditForm/field/Customer/item/" . $this->ID . "/edit' target='_blank'>Activate user</a></p>";
+				$body .= "<a href='" . Director::absoluteBaseURL() . "admin/shop/Customer/EditForm/field/Customer/item/" . $this->ID . "/edit' target='_blank'>Activate user</a></p>";
 
 				$email = new Email($from, $to, $subject, $body);
 
@@ -161,7 +161,7 @@ class Customer extends Member {
 			}
 
 			// Notify user that their account has been Activated
-			if($this->Activated && !$this->SentUserActivation){
+			if($this->Activated ){//&& !$this->SentUserActivation){
 				$siteconfig = SiteConfig::current_site_config();
 				$shopConfig = ShopConfig::current_shop_config();
 
@@ -172,7 +172,7 @@ class Customer extends Member {
 				$body = "<p>Hi " . $this->FirstName . ",</p>";
 				$body .= "<p>Your account has been successfully activated.</p>";
 				$body .= "<p>You can now access your account at the following URL.<br />";
-				$body .= "<a href='" . Director::BaseURL() . "account/' target='_blank'>" . Director::BaseURL() . "account/</a></p>";
+				$body .= "<a href='" . Director::absoluteBaseURL() . "account/' target='_blank'>" . Director::absoluteBaseURL() . "account/</a></p>";
 				$body .= "<p>Thanks,<br />The " . $siteconfig->Title . " team.</p>";
 
 				$email = new Email($from, $to, $subject, $body);
