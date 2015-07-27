@@ -161,7 +161,7 @@ class Customer extends Member {
 			}
 
 			// Notify user that their account has been Activated
-			if($this->Activated ){//&& !$this->SentUserActivation){
+			if($this->Activated && !$this->SentUserActivation){
 				$siteconfig = SiteConfig::current_site_config();
 				$shopConfig = ShopConfig::current_shop_config();
 
