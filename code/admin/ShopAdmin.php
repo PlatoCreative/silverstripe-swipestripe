@@ -1,7 +1,7 @@
 <?php
 /**
  * Shop admin area for managing orders, customers and shop settings.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -27,19 +27,19 @@ class ShopAdmin extends ModelAdmin {
 	);
 
 	public static $hidden_sections = array();
-	
+
 	private static $allowed_actions = array(
 		'EditForm',
 		'SettingsContent',
 		'SettingsForm'
 	);
 
-	public function init() {		
+	public function init() {
 		parent::init();
 
 		Requirements::css(CMS_DIR . '/css/screen.css');
 		Requirements::css('swipestripe/css/ShopAdmin.css');
-		
+
 		Requirements::combine_files(
 			'cmsmain.js',
 			array_merge(
@@ -74,9 +74,9 @@ class ShopAdmin extends ModelAdmin {
 		}
 		if(!count($models)) {
 			user_error(
-				'ModelAdmin::getManagedModels(): 
+				'ModelAdmin::getManagedModels():
 				You need to specify at least one DataObject subclass in private static $managed_models.
-				Make sure that this property is defined, and that its visibility is set to "public"', 
+				Make sure that this property is defined, and that its visibility is set to "public"',
 				E_USER_ERROR
 			);
 		}
@@ -95,13 +95,13 @@ class ShopAdmin extends ModelAdmin {
 	 * Returns managed models' create, search, and import forms
 	 * @uses SearchContext
 	 * @uses SearchFilter
-	 * @return SS_List of forms 
+	 * @return SS_List of forms
 	 */
 	protected function getManagedModelTabs() {
 		$forms  = new ArrayList();
 
 		$models = $this->getManagedModels();
-		foreach($models as $class => $options) { 
+		foreach($models as $class => $options) {
 			$forms->push(new ArrayData(array (
 				'Title'     => $options['title'],
 				'ClassName' => $class,
@@ -109,7 +109,7 @@ class ShopAdmin extends ModelAdmin {
 				'LinkOrCurrent' => ($class == $this->modelClass) ? 'current' : 'link'
 			)));
 		}
-		
+
 		return $forms;
 	}
 
@@ -132,7 +132,7 @@ class ShopAdmin extends ModelAdmin {
 		if ($this->modelClass == 'ShopConfig') {
 			return $this->renderWith('ShopAdmin_ConfigEditForm');
 		}
-		
+
 		$list = $this->getList();
 
 		$buttonAfter = new GridFieldButtonRow('after');
@@ -172,7 +172,7 @@ class ShopAdmin extends ModelAdmin {
 		$form->setFormAction(Controller::join_links($this->Link($this->sanitiseClassName($this->modelClass)), 'EditForm'));
 		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
 		$this->extend('updateEditForm', $form);
-		
+
 		return $form;
 	}
 
@@ -215,16 +215,16 @@ class ShopAdmin extends ModelAdmin {
 
 /**
  * Shop admin area for managing email settings
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
  * @subpackage admin
  */
 class ShopAdmin_EmailAdmin extends ShopAdmin {
-	
+
 	private static $tree_class = 'ShopConfig';
-	
+
 	private static $allowed_actions = array(
 		'EmailSettings',
 		'EmailSettingsForm',
@@ -286,7 +286,7 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 					}
 				),
 				$this->response
-			); 
+			);
 			return $responseNegotiator->respond($this->getRequest());
 		}
 
@@ -295,7 +295,7 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 
 	public function EmailSettingsForm() {
 
-		$shopConfig = ShopConfig::get()->First();
+		$shopConfig = ShopConfig::current_shop_config();
 
 		$fields = new FieldList(
 			$rootTab = new TabSet("Root",
@@ -351,7 +351,7 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 		//Hack for LeftAndMain::getRecord()
 		// self::$tree_class = 'ShopConfig';
 
-		$config = ShopConfig::get()->First();
+		$config = ShopConfig::current_shop_config();
 		$form->saveInto($config);
 		$config->write();
 		$form->sessionMessage('Saved Email Settings', 'good');
@@ -374,7 +374,7 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 				}
 			),
 			$this->response
-		); 
+		);
 		return $responseNegotiator->respond($this->getRequest());
 	}
 
@@ -394,16 +394,16 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 
 /**
  * Shop admin area for managing base currency
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
  * @subpackage admin
  */
 class ShopAdmin_BaseCurrency extends ShopAdmin {
-	
+
 	private static $tree_class = 'ShopConfig';
-	
+
 	private static $allowed_actions = array(
 		'BaseCurrencySettings',
 		'BaseCurrencySettingsForm',
@@ -465,7 +465,7 @@ class ShopAdmin_BaseCurrency extends ShopAdmin {
 					}
 				),
 				$this->response
-			); 
+			);
 			return $responseNegotiator->respond($this->getRequest());
 		}
 
@@ -549,7 +549,7 @@ class ShopAdmin_BaseCurrency extends ShopAdmin {
 				}
 			),
 			$this->response
-		); 
+		);
 		return $responseNegotiator->respond($this->getRequest());
 	}
 
@@ -569,7 +569,7 @@ class ShopAdmin_BaseCurrency extends ShopAdmin {
 
 /**
  * Extension for admin area to apply shop admin CSS etc.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -591,4 +591,3 @@ class ShopAdmin_LeftAndMainExtension extends Extension {
 		return true;
 	}
 }
-

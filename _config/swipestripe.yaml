@@ -15,6 +15,7 @@ Modifier:
 ShopConfig:
   HideVariationsOnSpecial: false
   RedirectOnAddToCart: true
+  RequireUserActivation: false
 
 ShopAdmin:
   menu_icon: 'swipestripe/images/basket.png'

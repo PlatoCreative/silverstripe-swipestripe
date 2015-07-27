@@ -1,7 +1,7 @@
 <?php
 /**
  * Represents a {@link Customer}, a type of {@link Member}.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -10,12 +10,15 @@
 class Customer extends Member {
 
 	private static $db = array(
-		'Code' => 'Int' //Just to trigger creating a Customer table
+		'Code' => 'Int', //Just to trigger creating a Customer table
+		'Activated' => 'Boolean',
+		'SentActivation' => 'Boolean',
+		'SentUserActivation' => 'Boolean'
 	);
-	
+
 	/**
 	 * Link customers to {@link Address}es and {@link Order}s.
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $has_many = array(
@@ -26,10 +29,10 @@ class Customer extends Member {
 		'Surname',
 		'Email'
 	);
-	
+
 	/**
 	 * Prevent customers from being deleted.
-	 * 
+	 *
 	 * @see Member::canDelete()
 	 */
 	public function canDelete($member = null) {
@@ -54,7 +57,7 @@ class Customer extends Member {
 		$allGroups = DataObject::get('Group');
 		$existingCustomerGroup = $allGroups->find('Title', 'Customers');
 		if (!$existingCustomerGroup) {
-			
+
 			$customerGroup = new Group();
 			$customerGroup->Title = 'Customers';
 			$customerGroup->setCode($customerGroup->Title);
@@ -66,22 +69,22 @@ class Customer extends Member {
 
 	/**
 	 * Add some fields for managing Members in the CMS.
-	 * 
+	 *
 	 * @return FieldList
 	 */
 	public function getCMSFields() {
 
 		$fields = new FieldList();
 
-		$fields->push(new TabSet('Root', 
+		$fields->push(new TabSet('Root',
 			Tab::create('Customer')
 		));
 
 		$password = new ConfirmedPasswordField(
-			'Password', 
-			null, 
-			null, 
-			null, 
+			'Password',
+			null,
+			null,
+			null,
 			true // showOnClick
 		);
 		$password->setCanBeEmpty(true);
@@ -99,10 +102,10 @@ class Customer extends Member {
 
 		return $fields;
 	}
-	
+
 	/**
 	 * Overload getter to return only non-cart orders
-	 * 
+	 *
 	 * @return ArrayList Set of previous orders for this member
 	 */
 	public function Orders() {
@@ -110,7 +113,7 @@ class Customer extends Member {
 			->where("\"MemberID\" = " . $this->ID . " AND \"Order\".\"Status\" != 'Cart'")
 			->sort("\"Created\" DESC");
 	}
-	
+
 	/**
 	 * Returns the current logged in customer
 	 *
@@ -122,5 +125,81 @@ class Customer extends Member {
 		if($id) {
 			return DataObject::get_one("Customer", "\"Member\".\"ID\" = $id");
 		}
+	}
+
+	public function onAfterWrite(){
+		parent::onAfterWrite();
+		$siteconfig = SiteConfig::current_site_config();
+
+		// Check the user permsissions and send confirmation email
+		$shopConfig = ShopConfig::current_shop_config();
+		if($shopConfig->config()->RequireUserActivation){
+			// Notify admin that a new customer has registered
+			if(!$this->Activated && !$this->SentActivation){
+				$siteconfig = SiteConfig::current_site_config();
+				$shopConfig = ShopConfig::current_shop_config();
+
+				$to = $shopConfig->NotificationTo;
+				$from = $shopConfig->NotificationTo;
+				$subject = $siteconfig->Title . ' - Customer Activation';
+
+				$body = "<p>Hi,</p>";
+				$body .= "<p>There has been a new customer registration on the " . $siteconfig->Title . " website.</p>";
+				$body .= "<p><strong>Customer Details:</strong><br />";
+				$body .= "Name: " . $this->FirstName . " " . $this->LastName . "<br />";
+				$body .= "Email: " . $this->Email . "<br />";
+				$body .= "Account Number: " . $this->AccountNumber . "</p>";
+				$body .= "<p>Activate the user by clicking the following link.<br />";
+				$body .= "<a href='" . Director::BaseURL() . "admin/shop/Customer/EditForm/field/Customer/item/" . $this->ID . "/edit' target='_blank'>Activate user</a></p>";
+
+				$email = new Email($from, $to, $subject, $body);
+
+				if($email->send()){
+					$this->owner->SentActivation = 1;
+					$this->owner->write();
+				}
+			}
+
+			// Notify user that their account has been Activated
+			if($this->Activated && !$this->SentUserActivation){
+				$siteconfig = SiteConfig::current_site_config();
+				$shopConfig = ShopConfig::current_shop_config();
+
+				$to = $this->Email;
+				$from = $shopConfig->ReceiptFrom;
+				$subject = $siteconfig->Title . ' - Account Activation';
+
+				$body = "<p>Hi " . $this->FirstName . ",</p>";
+				$body .= "<p>Your account has been successfully activated.</p>";
+				$body .= "<p>You can now access your account at the following URL.<br />";
+				$body .= "<a href='" . Director::BaseURL() . "account/' target='_blank'>" . Director::BaseURL() . "account/</a></p>";
+				$body .= "<p>Thanks,<br />The " . $siteconfig->Title . " team.</p>";
+
+				$email = new Email($from, $to, $subject, $body);
+
+				if($email->send()){
+					$this->owner->SentUserActivation = 1;
+					$this->owner->write();
+				}
+			}
+		}
+	}
+
+	public function canLogIn() {
+		$shopConfig = ShopConfig::current_shop_config();
+		$result = Parent::canLogIn();
+
+		if($shopConfig->config()->RequireUserActivation){
+			if(!$this->Activated){
+				$result->error(_t (
+					'Member.NEEDSAPPROVALTOLOGIN',
+					'An administrator must confirm your account before you can log in.'
+				));
+			}
+		}
+
+		$this->extend('canLogIn', $result);
+
+		return $result;
 	}
 }

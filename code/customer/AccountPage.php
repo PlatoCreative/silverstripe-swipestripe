@@ -294,6 +294,7 @@ class AccountPage_Controller extends Page_Controller {
 	function doRegisterAccount($data, $form){
 		//Save or create a new customer/member
 		$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
+		$shopConfig = ShopConfig::current_shop_config();
 
 		if(!$member->exists()){
 			$existingCustomer = Customer::get()->where("\"Email\" = '" . $data['Email'] . "'");
@@ -309,13 +310,15 @@ class AccountPage_Controller extends Page_Controller {
 				$form->saveInto($member);
 				$member->write();
 				$member->addToGroupByCode('customers');
-				$member->logIn();
+
+				if(!$shopConfig->config()->RequireUserActivation){
+					$member->logIn();
+					$form->sessionMessage('Account created successfully', 'good');
+				}
 			}
 		}
 
 		$this->extend('updateAccountRegister', $data, $member);
-
-		$form->sessionMessage('Account created successfully', 'good');
 
 		if(isset($data['Redirect'])){
 			if(Director::is_ajax()){
@@ -324,7 +327,16 @@ class AccountPage_Controller extends Page_Controller {
 				return Controller::curr()->redirect($data['Redirect']);
 			}
 		} else {
-			return Controller::curr()->redirect("/Account");
+			if($shopConfig->config()->RequireUserActivation){
+				$this->customise(array(
+					'Title' => 'Account Registered Successfully',
+					'Content' => '<h3>Thanks for registering an account with us.</h3><p>Before you can access your account an administrator will need to activate this for you. You will receive an email confirmation once this is completed.</p>',
+					'Form' => ''
+				));
+				return $this->renderWith(array('AccountPage_GeneralForm', 'Page'));
+			} else {
+				return Controller::curr()->redirect("/Account");
+			}
 		}
 	}
 
