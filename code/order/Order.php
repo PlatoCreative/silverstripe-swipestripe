@@ -400,22 +400,19 @@ class Order extends DataObject implements PermissionProvider {
 			Tab::create('Order')
 		));
 
-		//Override this in updateOrderCMSFields to change the order template in the CMS
+		// Override this in updateOrderCMSFields to change the order template in the CMS
 		$htmlSummary = $this->customise(array(
 			'MemberEmail' => $this->Member()->Email
 		))->renderWith('OrderAdmin');
-		$fields->addFieldToTab('Root.Order', new LiteralField('MainDetails', $htmlSummary));
+		$fields->addFieldToTab('Root.Order', LiteralField::create('MainDetails', $htmlSummary));
 
-		//Updates
-		$listField = new GridField(
-			'Updates',
-			'Updates',
-			$this->Updates(),
-			GridFieldConfig_Basic::create()
-		);
-		$fields->addFieldToTab('Root.Updates', $listField);
+		// Updates
+		$updatesConf = GridFieldConfig_RelationEditor::create(10);
+		$fields->addFieldsToTab('Root.Updates', array(
+			GridField::create('Updates', 'Updates', $this->Updates(), $updatesConf)
+		));
 
-		//Ability to edit fields added to CMS here
+		// Ability to edit fields added to CMS here
 		$this->extend('updateOrderCMSFields', $fields);
 
 		return $fields;
