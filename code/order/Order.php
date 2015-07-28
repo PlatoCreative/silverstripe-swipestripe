@@ -212,7 +212,7 @@ class Order extends DataObject implements PermissionProvider {
 	 */
 	public function canEdit($member = null) {
 		if ($member == null && !$member = Member::currentUser()) return false;
-		
+
 		$contentgroup = Group::get()->filter(array('code' => 'content-authors'))->first();
 		$administratorPerm = (Permission::check('ADMIN') || $member->inGroup($contentgroup->ID)) && Permission::check('EDIT_ORDER', 'any', $member);
 
@@ -881,15 +881,34 @@ class Order_Update extends DataObject {
 	 * @see DataObject::onAfterWrite()
 	 */
 	public function onAfterWrite() {
-
 		parent::onAfterWrite();
 
-		//Update the Order, setting the same status
+		$siteconfig = SiteConfig::current_site_config();
+		$shopConfig = ShopConfig::current_shop_config();
+
+		// Update the Order, setting the same status
 		if ($this->Status) {
 			$order = $this->Order();
 			if ($order->exists()) {
-				$order->Status = $this->Status;
-				$order->write();
+				if($order->Status != $this->Status){
+					$order->Status = $this->Status;
+					$order->write();
+
+					// Email the customer about update
+					$to = $order->Member()->Email;
+					$from = $shopConfig->NotificationTo;
+					$subject = $siteconfig->Title . ' - Order #' . $order->ID . ' Update';
+
+					$body = "<p>Hi " . $order->Member()->FirstName . ",</p>";
+					$body .= "<p>There has been the following update to your order #" . $order->ID . ".</p>";
+					$body .= "<p><strong>Order Status:</strong> " . $this->Status;
+					$body .= $this->Note ? "<br />" . $this->Note . "<br />" : "";
+					$body .= "</p>";
+					$body .= "<p>You can view this order by visiting the following URL<br />";
+					$body .= "<a href='" . Director::absoluteBaseURL() . "account/order/" . $order->ID . "' target='_blank'>" . Director::absoluteBaseURL() . "account/order/" . $order->ID . "</a></p>";
+
+					$email = new Email($from, $to, $subject, $body);
+				}
 			}
 		}
 	}
