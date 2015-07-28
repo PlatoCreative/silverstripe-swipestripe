@@ -187,7 +187,7 @@ class Customer extends Member {
 
 	public function canLogIn() {
 		$shopConfig = ShopConfig::current_shop_config();
-		$result = Parent::canLogIn();
+		$result = Member::canLogIn();
 
 		if($shopConfig->config()->RequireUserActivation){
 			if(!$this->Activated){
