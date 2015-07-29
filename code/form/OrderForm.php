@@ -308,17 +308,14 @@ class OrderForm extends Form {
 	}
 
 	public function update(SS_HTTPRequest $request) {
-
 		if ($request->isPOST()) {
-
 			$member = Customer::currentUser() ? Customer::currentUser() : singleton('Customer');
 			$order = Cart::get_current_order();
 
 			//Update the Order
 			$order->update($request->postVars());
 
-			$order->updateModifications($request->postVars())
-				->write();
+			$order->updateModifications($request->postVars())->write();
 
 			$form = OrderForm::create(
 				$this->controller,
