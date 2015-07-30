@@ -1,11 +1,11 @@
 <?php
 /**
- * Modification for the {@link Order}, saves data that is set by {@link Modifier}s 
+ * Modification for the {@link Order}, saves data that is set by {@link Modifier}s
  * e.g: shipping, tax, vouchers etc. Instead of linking to a {@link Modifier} it takes the Amount
  * that the modifier will ammend the {@link Order} total by and the Description of the Modifier
  * and saves that - denormalising the data - so that Modifiers can be deleted without losing
  * any information from the Order.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
@@ -15,9 +15,9 @@ class Modification extends DataObject {
 
 	/**
 	 * DB fields for the order Modification, the actual {@link Modifier} data is saved into
-	 * this class so if a modifier is deleted the order still has the necessary 
+	 * this class so if a modifier is deleted the order still has the necessary
 	 * details.
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $db = array(
@@ -27,10 +27,11 @@ class Modification extends DataObject {
 		'SubTotalModifier' => 'Boolean',
 		'SortOrder' => 'Int'
 	);
+	// Note: Sortorder must be different to any other modification
 
 	/**
 	 * Relations for this class
-	 * 
+	 *
 	 * @var Array
 	 */
 	private static $has_one = array(
@@ -45,15 +46,14 @@ class Modification extends DataObject {
 
 		$classes = ClassInfo::subclassesFor('Modification');
 		foreach ($classes as $class) {
-
 			if ($class != 'Modification') {
 				$mod = new $class();
 				$temp[$mod->SortOrder] = $mod;
 			}
 		}
-		
+
 		//Sorting the modifications so they are applied in correct order
-		ksort($temp);	
+		ksort($temp);
 
 		foreach ($temp as $mod) {
 			$mods->push($mod);
@@ -74,7 +74,7 @@ class Modification extends DataObject {
 
 	/**
 	 * Display price, can decorate for multiple currency etc.
-	 * 
+	 *
 	 * @return Price
 	 */
 	public function Price() {
@@ -90,7 +90,7 @@ class Modification extends DataObject {
 	public function getFormFields() {
 		return new FieldList();
 	}
-	
+
 	public function ShowOrderModification(){
 		$template = $this->SubTotalModifier ? 'Order_SubTotalModification' : 'Order_TotalModification';
 		return $this->renderWith(array($template . '_' . $this->ClassName, $template));
