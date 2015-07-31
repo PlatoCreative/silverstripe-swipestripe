@@ -87,18 +87,14 @@ class Product extends Page implements HiddenClass {
 		return ($this->SpecialPrice > 0) ? true : false;
 	}
 
-	/*
-	public function Variations(){
+	public function ShowVariations(){
 		$shopConfig = ShopConfig::current_shop_config();
 
 		if($shopConfig->config()->HideVariationsOnSpecial){
-			$variations = $this->OnSpecial() ? null : Variation::get()->filter(array('ProductID' => $this->ID));
-		} else {
-			$variations = Variation::get()->filter(array('ProductID' => $this->ID));
+			return $this->OnSpecial() ? false : true;
 		}
-		return $variations;
+		return true;
 	}
-	*/
 
 	/**
 	 * Actual price in base currency, can decorate to apply discounts etc.
@@ -399,15 +395,12 @@ class Product extends Page implements HiddenClass {
 	 * @return Boolean
 	 */
 	public function requiresVariation() {
-		$variations = $this->Variations();
-		return $variations && $variations->exists();
-		/*
-		$attributes = $this->Attributes();
-
-		$this->extend('updaterequiresVariation', $attributes);
-
-		return $attributes && $attributes->exists();
-		*/
+		if($this->ShowVariations()){
+			$variations = $this->Variations();
+			return $variations && $variations->exists();
+		} else {
+			return false;
+		}
 	}
 
 	/**

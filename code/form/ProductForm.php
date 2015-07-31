@@ -30,7 +30,7 @@ class ProductForm extends Form {
 
 		//Add a map of all variations and prices to the page for updating the price
 		$map = array();
-		$variations = $this->product->Variations();
+		$variations = $this->product->ShowVariations() ? $this->product->Variations() : null;
 		$productPrice = $this->product->Price();
 
 		if($variations && $variations->exists()){
@@ -78,7 +78,7 @@ class ProductForm extends Form {
 		);
 
 		//$attributes = $this->product->Attributes();
-		$variations = $this->product->Variations();
+		$variations = $this->product->ShowVariations() ? $this->product->Variations() : null;
 		$attributes = new ArrayList();
 		if($variations && $variations->exists()) foreach ($variations as $variation){
 			// Check the stock level
@@ -304,13 +304,12 @@ class ProductForm_Validator extends RequiredFields {
 		$request = $this->form->getRequest();
 
 		//Get product variations from options sent
-		//TODO refactor this
 
 		$productVariations = new ArrayList();
 
 		$options = $request->postVar('Options');
 		$product = DataObject::get_by_id($data['ProductClass'], $data['ProductID']);
-		$variations = ($product) ? $product->Variations() : new ArrayList();
+		$variations = ($product && $product->ShowVariations()) ? $product->Variations() : new ArrayList();
 
 		if ($variations && $variations->exists()) foreach ($variations as $variation) {
 
