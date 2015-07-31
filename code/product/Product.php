@@ -26,22 +26,79 @@ class Product extends Page implements HiddenClass {
 		'ShortDescription' => 'HTMLText',
 		'Stock' => 'Int',
 		'SKU' => 'Varchar(250)'
+	);/**
+	 * Has many relations for Product.
+	 *
+	 * @var Array
+	 */
+	private static $has_many = array(
+		//'Attributes' => 'Attribute',
+		//'Options' => 'Option',
+		'Variations' => 'Variation',
+		'Images' => 'ProductImage'
+	);
+
+	private static $has_one = array(
+		'MainCategory' => 'ProductCategory'
+	);
+
+	/**
+	 * Belongs many many relations for Product
+	 *
+	 * @var Array
+	 */
+	private static $belongs_many_many = array(
+		'ProductCategories' => 'ProductCategory'
+	);
+
+	/**
+	 * Defaults for Product
+	 *
+	 * @var Array
+	 */
+	private static $defaults = array(
+		'ParentID' => -1
+	);
+
+	/**
+	 * Summary fields for displaying Products in the CMS
+	 *
+	 * @var Array
+	 */
+	private static $summary_fields = array(
+		'Amount.Nice' => 'Price',
+		'Title' => 'Title'
+	);
+
+	private static $searchable_fields = array(
+		'Title' => array(
+			'field' => 'TextField',
+			'filter' => 'PartialMatchFilter',
+			'title' => 'Name'
+		),
+		'ProductCategories.Title' => array(
+			'field' => 'TextField',
+			'filter' => 'PartialMatchFilter',
+			'title' => 'Category'
+		)
 	);
 
 	public function OnSpecial(){
 		return ($this->SpecialPrice > 0) ? true : false;
 	}
 
+	/*
 	public function Variations(){
 		$shopConfig = ShopConfig::current_shop_config();
 
 		if($shopConfig->config()->HideVariationsOnSpecial){
-			$variations = $this->OnSpecial() ? false : Variation::get()->filter(array('ProductID' => $this->ID));
+			$variations = $this->OnSpecial() ? null : Variation::get()->filter(array('ProductID' => $this->ID));
 		} else {
 			$variations = Variation::get()->filter(array('ProductID' => $this->ID));
 		}
 		return $variations;
 	}
+	*/
 
 	/**
 	 * Actual price in base currency, can decorate to apply discounts etc.
@@ -112,63 +169,6 @@ class Product extends Page implements HiddenClass {
 
 		return $amount;
 	}
-
-	/**
-	 * Has many relations for Product.
-	 *
-	 * @var Array
-	 */
-	private static $has_many = array(
-		//'Attributes' => 'Attribute',
-		//'Options' => 'Option',
-		'Variations' => 'Variation',
-		'Images' => 'ProductImage'
-	);
-
-	private static $has_one = array(
-		'MainCategory' => 'ProductCategory'
-	);
-
-	/**
-	 * Belongs many many relations for Product
-	 *
-	 * @var Array
-	 */
-	private static $belongs_many_many = array(
-		'ProductCategories' => 'ProductCategory'
-	);
-
-	/**
-	 * Defaults for Product
-	 *
-	 * @var Array
-	 */
-	private static $defaults = array(
-		'ParentID' => -1
-	);
-
-	/**
-	 * Summary fields for displaying Products in the CMS
-	 *
-	 * @var Array
-	 */
-	private static $summary_fields = array(
-		'Amount.Nice' => 'Price',
-		'Title' => 'Title'
-	);
-
-	private static $searchable_fields = array(
-		'Title' => array(
-			'field' => 'TextField',
-			'filter' => 'PartialMatchFilter',
-			'title' => 'Name'
-		),
-		'ProductCategories.Title' => array(
-			'field' => 'TextField',
-			'filter' => 'PartialMatchFilter',
-			'title' => 'Category'
-		)
-	);
 
 	private static $casting = array(
 		//'ProductCategory' => 'Varchar',

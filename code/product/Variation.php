@@ -38,7 +38,6 @@ class Variation extends DataObject implements PermissionProvider {
 	}
 
 	public function Price() {
-
 		$amount = $this->Amount();
 
 		//Transform price here for display in different currencies etc.
@@ -174,8 +173,7 @@ class Variation extends DataObject implements PermissionProvider {
 			)
 		);
 
-		$product = $this->Product();
-		$attributes = $shopConfig->Attributes();//$product->Attributes();
+		$attributes = $shopConfig->Attributes();
 		if ($attributes && $attributes->exists()) foreach ($attributes as $attribute) {
 			$options = $attribute->Options();
 			$currentOptionID = ($currentOption = $this->Options()->find('AttributeID', $attribute->ID)) ? $currentOption->ID : null;
@@ -456,15 +454,6 @@ class Variation extends DataObject implements PermissionProvider {
 				}
 			}
 		}
-
-		//Unpublish product if variations do not exist
-		// $product = $this->Product();
-		// $variations = $product->Variations();
-
-		//TODO this might not be a good idea to unpublish the product
-		// if (!in_array('Enabled', $variations->map('ID', 'Status')->toArray())) {
-		//   $product->doUnpublish();
-		// }
 	}
 
 	/**
