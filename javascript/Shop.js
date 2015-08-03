@@ -20,7 +20,12 @@ jQuery(document).ready(function($) {
 					$('#cart-overview').removeClass('show');
 					// Redirect user to the cart overview page
 					if($('#cart-summary-btn').length > 0 && $('#cart-summary-btn').hasClass('auto-redirect')){
-						window.location.replace($('#cart-summary-btn').attr('href'));
+						var catid = $('#product-page-cont').data('catid');
+						if(catid != ''){
+							window.location.replace($('#cart-summary-btn').attr('href') + '?catid=' + catid);
+						} else {
+							window.location.replace($('#cart-summary-btn').attr('href'));
+						}
 					}
 				}, 2000);
 			}

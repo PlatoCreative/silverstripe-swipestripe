@@ -1,24 +1,24 @@
 <?php
 /**
  * Form to display the {@link Order} contents on the {@link CartPage}.
- * 
+ *
  * @author Frank Mullenger <frankmullenger@gmail.com>
  * @copyright Copyright (c) 2011, Frank Mullenger
  * @package swipestripe
  * @subpackage form
  */
 class CartForm extends Form {
-	
+
 	/**
 	 * The current {@link Order} (cart).
-	 * 
+	 *
 	 * @var Order
 	 */
 	public $order;
-	
+
 	/**
 	 * Construct the form, set the current order and the template to be used for rendering.
-	 * 
+	 *
 	 * @param Controller $controller
 	 * @param String $name
 	 * @param FieldList $fields
@@ -66,10 +66,10 @@ class CartForm extends Form {
 		if ($items) foreach ($items as $item) {
 
 			$fields->push(CartForm_QuantityField::create(
-				'Quantity['.$item->ID.']', 
-				$item->Quantity, 
+				'Quantity['.$item->ID.']',
+				$item->Quantity,
 				$item
-			)); 
+			));
 		}
 
 		$this->extend('updateFields', $fields);
@@ -104,7 +104,7 @@ class CartForm extends Form {
 
 	/**
 	 * Update the current cart quantities then redirect back to the cart page.
-	 * 
+	 *
 	 * @param Array $data Data submitted from the form via POST
 	 * @param Form $form Form that data was submitted from
 	 */
@@ -116,14 +116,14 @@ class CartForm extends Form {
 
 	/**
 	 * Update the current cart quantities and redirect to checkout.
-	 * 
+	 *
 	 * @param Array $data Data submitted from the form via POST
 	 * @param Form $form Form that data was submitted from
 	 */
 	public function goToCheckout(Array $data, Form $form) {
 
 		$this->saveCart($data, $form);
-		
+
 		if ($checkoutPage = DataObject::get_one('CheckoutPage')) {
 			$this->controller->redirect($checkoutPage->AbsoluteLink());
 		}
@@ -133,7 +133,7 @@ class CartForm extends Form {
 
 	/**
 	 * Save the cart, update the order item quantities and the order total.
-	 * 
+	 *
 	 * @param Array $data Data submitted from the form via POST
 	 * @param Form $form Form that data was submitted from
 	 */
@@ -158,13 +158,18 @@ class CartForm extends Form {
 
 	/*
 	 * Retrieve the current {@link Order} which is the cart.
-	 * 
+	 *
 	 * @return Order The current order (cart)
 	 */
 	public function Cart() {
 		return $this->order;
 	}
-	
+
+	function CategoryLink(){
+		$catID = $_GET['catid'];
+		return $catID ? ProductCategory::get()->filter(array('ID' => $catID))->first() : false;
+	}
+
 }
 
 /**
@@ -178,17 +183,17 @@ class CartForm_QuantityField extends TextField {
 	 * @var String
 	 */
 	protected $template = "CartForm_QuantityField";
-	
+
 	/**
 	 * Current {@link Item} represented by this field.
-	 * 
+	 *
 	 *  @var Item
 	 */
 	protected $item;
-	
+
 	/**
 	 * Construct the field and set the current {@link Item} that this field represents.
-	 * 
+	 *
 	 * @param String $name
 	 * @param String $title
 	 * @param String $value
@@ -201,39 +206,39 @@ class CartForm_QuantityField extends TextField {
 		$this->item = $item;
 		parent::__construct($name, '', $value, null, null);
 	}
-	
+
 	/**
 	 * Render the field with the appropriate template.
-	 * 
+	 *
 	 * @see FormField::FieldHolder()
 	 */
 	function FieldHolder($properties = array()) {
 		$obj = ($properties) ? $this->customise($properties) : $this;
 		return $this->renderWith($this->template);
 	}
-	
+
 	/**
 	 * Retrieve the current {@link Item} this field represents. Used in the template.
-	 * 
+	 *
 	 * @return Item
 	 */
 	function Item() {
 		return $this->item;
 	}
-	
+
 	/**
 	 * Set the current {@link Item} this field represents
-	 * 
+	 *
 	 * @param Item $item
 	 */
 	function setItem(Item $item) {
 		$this->item = $item;
 	}
-	
+
 	/**
-	 * Validate this field, check that the current {@link Item} is in the current 
+	 * Validate this field, check that the current {@link Item} is in the current
 	 * {@Link Order} and is valid for adding to the cart.
-	 * 
+	 *
 	 * @see FormField::validate()
 	 * @return Boolean
 	 */
@@ -252,12 +257,12 @@ class CartForm_QuantityField extends TextField {
 
 		//Check that item exists and is in the current order
 		if (!$item || !$item->exists() || !$items->find('ID', $item->ID)) {
-			
+
 			$errorMessage = _t('Form.ITEM_IS_NOT_IN_ORDER', 'This product is not in the Cart.');
 			if ($msg = $this->getCustomValidationMessage()) {
 				$errorMessage = $msg;
 			}
-			
+
 			$validator->validationError(
 				$this->getName(),
 				$errorMessage,
@@ -274,7 +279,7 @@ class CartForm_QuantityField extends TextField {
 					if ($msg = $this->getCustomValidationMessage()) {
 						$errorMessage = $msg;
 					}
-					
+
 					$validator->validationError(
 						$this->getName(),
 						$errorMessage,
@@ -290,7 +295,7 @@ class CartForm_QuantityField extends TextField {
 					if ($msg = $this->getCustomValidationMessage()) {
 						$errorMessage = $msg;
 					}
-					
+
 					$validator->validationError(
 						$this->getName(),
 						$errorMessage,
@@ -303,7 +308,7 @@ class CartForm_QuantityField extends TextField {
 					if ($msg = $this->getCustomValidationMessage()) {
 						$errorMessage = $msg;
 					}
-					
+
 					$validator->validationError(
 						$this->getName(),
 						$errorMessage,
@@ -314,12 +319,12 @@ class CartForm_QuantityField extends TextField {
 
 				$validation = $item->validateForCart();
 				if (!$validation->valid()) {
-					
+
 					$errorMessage = $validation->message();
 					if ($msg = $this->getCustomValidationMessage()) {
 						$errorMessage = $msg;
 					}
-					
+
 					$validator->validationError(
 						$this->getName(),
 						$errorMessage,
@@ -329,12 +334,11 @@ class CartForm_QuantityField extends TextField {
 				}
 			}
 		}
-		
+
 		return $valid;
 	}
 
 	public function Type() {
-		return 'cartquantity';	
+		return 'cartquantity';
 	}
-	
 }

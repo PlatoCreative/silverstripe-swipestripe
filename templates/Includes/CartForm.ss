@@ -52,13 +52,14 @@
 			</table>
 
 			<div class="Actions">
+				<% if CategoryLink() %>
+					<a href="$CategoryLink.Link" class="btn">Continue Shopping</a>
+				<% end_if %>
 				<% if Cart.Items %>
 					<% if Actions %>
-
 						<% loop Actions %>
 							$Field
 						<% end_loop %>
-
 					<% end_if %>
 				<% end_if %>
 			</div>
