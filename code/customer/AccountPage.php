@@ -355,10 +355,10 @@ class AccountPage_Controller extends Page_Controller {
 		$customer = Customer::currentUser();
 
 		$fields = FieldList::create(
-			TextField::create('FirstName', 'First Name', $customer->FirstName),
-			TextField::create('Surname', 'Surname', $customer->Surname),
-			EmailField::create('Email', 'Email address', $customer->Email),
-			ConfirmedPasswordField::create('Password', 'Password', $customer->Password, $this, true)
+			TextField::create('FirstName', 'First Name', $customer ? $customer->FirstName : null),
+			TextField::create('Surname', 'Surname', $customer ? $customer->Surname : null),
+			EmailField::create('Email', 'Email address', $customer ? $customer->Email : null),
+			ConfirmedPasswordField::create('Password', 'Password', $customer ? $customer->Password : null, $this, true)
 		);
 
 		$required = RequiredFields::create('FirstName', 'Surname', 'Email', 'Password');
