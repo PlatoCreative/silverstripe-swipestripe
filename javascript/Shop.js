@@ -78,7 +78,7 @@ jQuery(document).ready(function($) {
 			}
 
 			// Remove from cart function
-			$('.cart-summary-remove').attr('href', window.location.href + '/RemoveItem');
+			$('.cart-summary-remove').attr('href', '/cart/RemoveItem');
 			$('body').on('click', 'a.cart-summary-remove', function(e){
 				e.preventDefault();
 				var removeItem = $(this).attr('data-item');
