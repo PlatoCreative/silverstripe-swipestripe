@@ -375,7 +375,10 @@ class Order extends DataObject implements PermissionProvider {
 		$this->PaymentStatus = ($this->getPaid()) ? 'Paid' : 'Unpaid';
 		$this->write();
 
-		if(!$this->ReceiptSent){
+		$lastpayment = $this->Payments() ? $this->Payments()->Last() : null;
+		$paymentstatus = $lastpayment ? $lastpayment->Status : null;
+
+		if(!$this->ReceiptSent && $paymentstatus != 'Failure'){
 			if(ReceiptEmail::create($this->Member(), $this)->send()){
 				$this->ReceiptSent = 1;
 				$this->write();

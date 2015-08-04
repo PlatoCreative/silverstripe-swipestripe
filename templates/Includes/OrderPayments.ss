@@ -1,5 +1,5 @@
 <table class="table table-bordered">
-	<thead>     
+	<thead>
 		<tr>
 			<th><% _t('OrderPayments.PAYMENT','Payment') %></th>
 			<th><% _t('OrderPayments.DATE','Date') %></th>
@@ -8,7 +8,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<% loop Payments %>  
+		<% loop Payments %>
 			$OrderPaymentRow()
 		<% end_loop %>
 	</tbody>
