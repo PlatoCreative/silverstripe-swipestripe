@@ -167,7 +167,8 @@ class CartForm extends Form {
 
 	function CategoryLink(){
 		$catID = isset($_GET['catid']) ? $_GET['catid'] : false;
-		return $catID ? ProductCategory::get()->filter(array('ID' => $catID))->first() : false;
+		$page = $catID ? ProductCategory::get()->filter(array('ID' => $catID))->first() : ProductCategory::get()->filter(array('ParentID' => '0'))->first();
+		return $page ? $page : false;
 	}
 
 }
