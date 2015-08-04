@@ -88,7 +88,9 @@ class Customer extends Member {
 			true // showOnClick
 		);
 		$password->setCanBeEmpty(true);
-		if(!$this->ID) $password->showOnClick = false;
+		if(!$this->ID){
+			$password->showOnClick = false;
+		}
 
 		$fields->addFieldsToTab('Root.Customer', array(
 			new TextField('FirstName'),
@@ -135,10 +137,7 @@ class Customer extends Member {
 		$shopConfig = ShopConfig::current_shop_config();
 		if($shopConfig->config()->RequireUserActivation){
 			// Notify admin that a new customer has registered
-			if(!$this->Activated && !$this->SentActivation){
-				$siteconfig = SiteConfig::current_site_config();
-				$shopConfig = ShopConfig::current_shop_config();
-
+			if(!$this->Activated && !$this->SentActivation && $shopConfig){
 				$to = $shopConfig->NotificationTo;
 				$from = $shopConfig->NotificationTo;
 				$subject = $siteconfig->Title . ' - Customer Activation';

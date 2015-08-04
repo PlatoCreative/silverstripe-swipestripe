@@ -269,10 +269,10 @@ class AccountPage_Controller extends Page_Controller {
 	// Form for registering account
 	function RegisterAccountForm($params){
 		$fields = FieldList::create(
-			TextField::create('FirstName', 'First Name', $params['FirstName']),
-			TextField::create('Surname', 'Surname', $params['Surname']),
-			EmailField::create('Email', 'Email address', $params['Email']),
-			ConfirmedPasswordField::create('Password', 'Password', '')
+			TextField::create('FirstName', 'First Name', $params['FirstName'])->addExtraClass('requiredField'),
+			TextField::create('Surname', 'Surname', $params['Surname'])->addExtraClass('requiredField'),
+			EmailField::create('Email', 'Email address', $params['Email'])->addExtraClass('requiredField'),
+			ConfirmedPasswordField::create('Password', 'Password', '')->addExtraClass('requiredField')
 		);
 
 		if(isset($params['Redirect'])){
@@ -309,7 +309,9 @@ class AccountPage_Controller extends Page_Controller {
 				$member = Customer::create();
 				$form->saveInto($member);
 				$member->write();
+				$member->changePassword($data['Password']['_Password']);
 				$member->addToGroupByCode('customers');
+				$member->write();
 
 				if(!$shopConfig->config()->RequireUserActivation){
 					$member->logIn();
