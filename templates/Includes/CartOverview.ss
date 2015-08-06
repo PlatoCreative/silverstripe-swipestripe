@@ -15,7 +15,7 @@
 				<% if Cart && Cart.Items %>
 					<div id="cart-overview-info">
 						<% with Cart %>
-							<% loop Items.limit(3) %>
+							<% loop Items.limit(2) %>
 								<div class="cart-overview-item clearfix">
 									<% if Product.Images %>
 										<img src="$Product.Images.First().Image.CroppedImage(100,100).URL" alt="$Title" />
@@ -24,6 +24,10 @@
 									<div class="cart-overview-item-text">
 										<a href="$Product.Link()" alt="$Produc.Title" class="cart-overview-item-title">
 											$Product.Title
+											<% if Product.SKU %>
+												<br />
+												<small>SKU: $Product.SKU</small>
+											<% end_if %>
 										</a>
 										<p class="cart-overview-qty">Qty: $Quantity</p>
 										<p class="cart-overview-price">$Total.Nice()</p>
