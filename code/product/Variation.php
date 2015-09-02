@@ -179,7 +179,7 @@ class Variation extends DataObject implements PermissionProvider {
 			$currentOptionID = ($currentOption = $this->Options()->find('AttributeID', $attribute->ID)) ? $currentOption->ID : null;
 
 			$optionField = new OptionField($attribute->ID, $attribute->Title, $options, $currentOptionID);
-			$optionField->setHasEmptyDefault(false);
+			$optionField->setEmptyString("Select an attribute");
 			$fields->addFieldToTab('Root.Variation', $optionField);
 		}
 
