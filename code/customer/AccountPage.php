@@ -287,7 +287,11 @@ class AccountPage_Controller extends Page_Controller {
 			FormAction::create('doRegisterAccount', 'Register')
 		);
 
-		return Form::create($this, 'RegisterAccountForm', $fields, $actions, $required);
+		$form = Form::create($this, 'RegisterAccountForm', $fields, $actions, $required);
+        
+        $this->extend('updateRegisterAccountForm', $form);
+
+        return $form;
 	}
 
 	// Update the users account
