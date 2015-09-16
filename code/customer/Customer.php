@@ -131,57 +131,6 @@ class Customer extends Member {
 
 	public function onAfterWrite(){
 		parent::onAfterWrite();
-		$siteconfig = SiteConfig::current_site_config();
-
-		// Check the user permsissions and send confirmation email
-		$shopConfig = ShopConfig::current_shop_config();
-		if($shopConfig->config()->RequireUserActivation){
-			// Notify admin that a new customer has registered
-			if(!$this->Activated && !$this->SentActivation && $shopConfig){
-				$to = $shopConfig->NotificationTo;
-				$from = $shopConfig->NotificationTo;
-				$subject = $siteconfig->Title . ' - Customer Activation';
-
-				$body = "<p>Hi,</p>";
-				$body .= "<p>There has been a new customer registration on the " . $siteconfig->Title . " website.</p>";
-				$body .= "<p><strong>Customer Details:</strong><br />";
-				$body .= "Name: " . $this->FirstName . " " . $this->LastName . "<br />";
-				$body .= "Email: " . $this->Email . "<br />";
-				$body .= "Account Number: " . $this->AccountNumber . "</p>";
-				$body .= "<p>Activate the user by clicking the following link.<br />";
-				$body .= "<a href='" . Director::absoluteBaseURL() . "admin/shop/Customer/EditForm/field/Customer/item/" . $this->ID . "/edit' target='_blank'>Activate user</a></p>";
-
-				$email = new Email($from, $to, $subject, $body);
-
-				if($email->send()){
-					$this->owner->SentActivation = 1;
-					$this->owner->write();
-				}
-			}
-
-			// Notify user that their account has been Activated
-			if($this->Activated && !$this->SentUserActivation){
-				$siteconfig = SiteConfig::current_site_config();
-				$shopConfig = ShopConfig::current_shop_config();
-
-				$to = $this->Email;
-				$from = $shopConfig->ReceiptFrom;
-				$subject = $siteconfig->Title . ' - Account Activation';
-
-				$body = "<p>Hi " . $this->FirstName . ",</p>";
-				$body .= "<p>Your account has been successfully activated.</p>";
-				$body .= "<p>You can now access your account at the following URL.<br />";
-				$body .= "<a href='" . Director::absoluteBaseURL() . "account/' target='_blank'>" . Director::absoluteBaseURL() . "account/</a></p>";
-				$body .= "<p>Thanks,<br />The " . $siteconfig->Title . " team.</p>";
-
-				$email = new Email($from, $to, $subject, $body);
-
-				if($email->send()){
-					$this->owner->SentUserActivation = 1;
-					$this->owner->write();
-				}
-			}
-		}
 	}
 
 	public function canLogIn() {
