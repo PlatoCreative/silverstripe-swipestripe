@@ -39,7 +39,7 @@ class ShopAdmin extends ModelAdmin {
 
 		Requirements::css(CMS_DIR . '/css/screen.css');
 		Requirements::css('swipestripe/css/ShopAdmin.css');
-
+		/*
 		Requirements::combine_files(
 			'cmsmain.js',
 			array_merge(
@@ -55,6 +55,7 @@ class ShopAdmin extends ModelAdmin {
 				Requirements::add_i18n_javascript(CMS_DIR . '/javascript/lang', true, true)
 			)
 		);
+		*/
 	}
 
 	/**
