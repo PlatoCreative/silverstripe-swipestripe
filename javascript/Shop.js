@@ -19,6 +19,7 @@ jQuery(document).ready(function($) {
 				window.setTimeout(function(){
 					$('#cart-overview').removeClass('show');
 					// Redirect user to the cart overview page
+					/*
 					if($('#cart-summary-btn').length > 0 && $('#cart-summary-btn').hasClass('auto-redirect')){
 						var catid = $('#product-page-cont').data('catid');
 						if(catid != ''){
@@ -27,6 +28,7 @@ jQuery(document).ready(function($) {
 							window.location.replace($('#cart-summary-btn').attr('href'));
 						}
 					}
+					*/
 				}, 2000);
 			}
 
