@@ -155,7 +155,7 @@ class ProductCategory_Controller extends Page_Controller {
 	 *
 	 * @var Int
 	 */
-	public static $products_per_page = 18;
+	public static $products_per_page = 20;
 
 	/**
 	 * Set how the products are ordered on ProductCategory pages
