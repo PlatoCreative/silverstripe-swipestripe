@@ -389,6 +389,7 @@ class AccountPage_Controller extends Page_Controller {
 
 			$customer->write();
 		}
+		$form->sessionMessage('Your details were successfully updated.', 'good');
 
 		return $this->redirectBack();
 	}
