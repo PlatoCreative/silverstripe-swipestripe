@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
 			updateCart: function() {
 				var self = this;
 				var values = this.serialize();
-				
+
 				$.ajax({
 					url: window.location.pathname + '/OrderForm/update',
 					type: 'POST',
@@ -42,7 +42,6 @@ jQuery(document).ready(function($) {
 			},
 
 			_indicateProcessing: function(e) {
-
 				$('input[name="action_process"]', this).attr('value', 'Processing...');
 				$('.Actions .loading', this).show();
 			}

@@ -31,7 +31,8 @@ class ShopConfig extends DataObject {
 		'ReceiptFrom' => 'Varchar',
 		'NotificationSubject' => 'Varchar',
 		'NotificationBody' => 'HTMLText',
-		'NotificationTo' => 'Varchar'
+		'NotificationTo' => 'Varchar',
+        'NotificationFrom' => 'Varchar'
 	);
 
 	private static $has_one = array(

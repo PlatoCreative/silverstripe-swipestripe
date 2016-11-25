@@ -312,9 +312,7 @@ class ShopAdmin_EmailAdmin extends ShopAdmin {
 					new TextareaField('EmailSignature', _t('ShopConfig.SIGNATURE', 'Signature'))
 				),
 				new Tab('Notification',
-					TextField::create('NotificationFrom', _t('ShopConfig.FROM', 'From'))
-						->setValue(_t('ShopConfig.NOTIFICATION_FROM', 'Customer email address'))
-						->performReadonlyTransformation(),
+					new TextField('NotificationFrom', _t('ShopConfig.NOTIFICATION_FROM', 'From')),
 					new TextField('NotificationTo', _t('ShopConfig.TO', 'To')),
 					new TextField('NotificationSubject', _t('ShopConfig.SUBJECT_LINE', 'Subject line')),
 					TextareaField::create('NotificationBody', _t('ShopConfig.MESSAGE', 'Message'))
