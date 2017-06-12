@@ -132,7 +132,12 @@ class AccountPage_Controller extends Page_Controller {
 	public function init() {
 		parent::init();
 		$params = $this->getURLParams();
-		if($params['Action'] != 'RegisterAccount' && $params['Action'] != 'RegisterAccountForm') {
+
+		$actions = new ArrayList(array('RegisterAccount', 'RegisterAccountForm'));
+
+		$this->extend('updateInitActions', $actions);
+
+		if(!in_array($params['Action'], $actions->toArray())) {
 			if(!Permission::check('VIEW_ORDER')){
 				return $this->redirect(Director::absoluteBaseURL() . 'Security/login?BackURL=' . urlencode($this->getRequest()->getVar('url')));
 			}
